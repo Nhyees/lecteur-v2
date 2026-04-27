@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #222;
+    color: white;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+#musicList {
+    background: #333;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.music-item {
+    background: #444;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    position: relative;
+}
+
+.music-item.active {
+    background-color: hsl(300, 34%, 33%);
+    font-weight: bold;
+}
+
+.delete-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: rgb(236, 204, 204);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    background: hsl(300, 34%, 33%);
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background: hsl(300, 34%, 33%);
+}
+
+#player {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #111;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Bouton "Supprimer" en bas à droite */
+.clear-button {
+    position: fixed;
+    bottom: 3px;
+    left: 3px;
+    padding: 10px 10px;
+    font-size: 10px;
+    background-color: hsl(300, 34%, 33%);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.clear-button:hover {
+    background-color: hsl(300, 35%, 28%);
+}
