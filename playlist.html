@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
+    <title>Playlist</title>
+    <link id="theme-link" rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <a href="index.html" class="back-button" aria-label="Retour au menu">⬅ Retour</a>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Changer de theme">🫧</button>
+
+    <div class="container">
+        <div class="music-list" id="musicList">
+            <input type="file" id="fileInput" accept=".json" aria-label="Importer une playlist JSON">
+            <button id="exportButton" class="btn" aria-label="Exporter la playlist en JSON">💾</button>
+            <h2>Liste des chansons</h2>
+        </div>
+        <div class="player-container">
+
+            <video id="videoPlayer" controls aria-label="Lecteur video"></video>
+            <audio id="audioPlayer" controls style="display: none;" aria-label="Lecteur audio"></audio>
+
+            <div class="controls">
+                <button id="prevButton" class="btn" aria-label="Chanson precedente">⏮</button>
+                <button id="randomButton" class="btn" aria-label="Activer ou desactiver le mode aleatoire">🎲</button>
+                <button id="repeatButton" class="btn" aria-label="Activer ou desactiver la repetition">♾️</button>
+                <button id="nextButton" class="btn" aria-label="Chanson suivante">⏭</button>
+            </div>
+
+            <div class="song-info-container">
+                <div id="songInfo">
+                    <p><strong>Anime :</strong> <span id="animeName"></span></p>
+                    <p><strong>Titre :</strong> <span id="songName"></span></p>
+                    <p><strong>Artiste :</strong> <span id="artistName"></span></p>
+                    <p><strong>Type :</strong> <span id="typeName"></span></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="history-toggle">
+        <button id="toggle-history" aria-label="Afficher ou masquer l'historique">🎵</button>
+        <div class="history-box" id="history-box">
+            <div id="historyContainer"></div>
+        </div>
+    </div>
+
+    <button id="clearButton" class="clear-button" aria-label="Vider la playlist">🗑️</button>
+
+    <img src="" alt="Image decorative" class="floating-image">
+
+    <script>
+        window.PLAYER_CONFIG = {
+            storageKey: "playlist",
+            extraStorageKeys: ["playlist_wrongSongs"]
+        };
+    </script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>

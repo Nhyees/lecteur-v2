@@ -251,44 +251,6 @@ video {
     background-color: #ff8a65;
 }
 
-.circle {
-    position: absolute;
-    background-color: #db4a60;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #b12e42;
-    cursor: pointer;
-}
-
-.score-display {
-    position: fixed;
-    top: 150px;
-    left: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 10px;
-    border-radius: 5px;
-}
-
-#game-toggle-btn {
-    position: fixed;
-    top: 100px;
-    left: 10px !important;
-    background-color: #ff8a65;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 9999;
-    transition: 0.3s;
-}
-
-#game-toggle-btn:hover {
-    background-color: #5d483a;
-}
 
 .history-toggle {
   position: fixed;
@@ -341,5 +303,38 @@ video {
 .history-item {
     border-bottom: 1px solid #ffffff;
     padding: 5px 0;
+}
+
+.empty-playlist-msg {
+    color: #f0c080;
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.playlist-manager {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    margin-bottom: 8px;
+}
+
+.playlist-manager select {
+    flex: 1;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.playlist-btn {
+    padding: 5px 9px;
+    font-size: 0.9em;
+    flex-shrink: 0;
 }
 

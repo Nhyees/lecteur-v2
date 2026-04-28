@@ -1,106 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #222;
-    color: white;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #1a1a1a;
+    color: #f0f0f0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.container {
-    max-width: 400px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
-}
+/* ------------------------------------------------------------------ */
+/* Liste de chansons (zone scrollable)                                 */
+/* ------------------------------------------------------------------ */
 
 #musicList {
-    background: #333;
-    padding: 10px;
-    border-radius: 10px;
+    flex: 1;
     overflow-y: auto;
-    max-height: 400px;
+    padding: 12px 12px 6px;
+    -webkit-overflow-scrolling: touch;
 }
 
-.music-item {
-    background: #444;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
+#musicList h2 {
+    font-size: 0.78em;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 6px 0 10px;
+}
+
+#fileInput {
+    font-size: 0.8em;
+    color: #aaa;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Gestionnaire de playlists                                           */
+/* ------------------------------------------------------------------ */
+
+.playlist-manager {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 6px;
+    padding: 6px 0 10px;
+    border-bottom: 1px solid #2e2e2e;
+    margin-bottom: 8px;
+}
+
+.playlist-manager select {
+    flex: 1;
+    background: #252525;
+    color: #f0f0f0;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.85em;
+    font-family: inherit;
     cursor: pointer;
-    font-size: 12px;
+}
+
+.playlist-btn {
+    padding: 8px 11px;
+    font-size: 0.85em;
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Elements de la liste                                                */
+/* ------------------------------------------------------------------ */
+
+.music-item {
+    background: #252525;
+    padding: 12px 44px 12px 14px;
+    margin: 5px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
     position: relative;
 }
 
+.music-item:active {
+    background: #303030;
+}
+
 .music-item.active {
-    background-color: hsl(300, 34%, 33%);
-    font-weight: bold;
+    background: #2a1e2e;
+}
+
+.music-item h3 {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.music-item p {
+    font-size: 0.72em;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .delete-button {
     position: absolute;
-    right: 10px;
-    top: 10px;
-    background: rgb(236, 204, 204);
-    color: white;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    color: #555;
     border: none;
-    padding: 5px 10px;
+    font-size: 1em;
     cursor: pointer;
-    border-radius: 5px;
+    padding: 6px;
+    border-radius: 50%;
+    line-height: 1;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-audio {
-    width: 100%;
-    margin-top: 10px;
+.delete-button:active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
 }
+
+.empty-playlist-msg {
+    color: #555;
+    font-style: italic;
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Barre de lecture fixee en bas                                       */
+/* ------------------------------------------------------------------ */
+
+#mobile-player {
+    flex-shrink: 0;
+    background: #111;
+    border-top: 1px solid #222;
+    padding: 10px 16px 16px;
+}
+
+video, audio {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: block;
+    max-height: 180px;
+    object-fit: contain;
+    background: #000;
+}
+
+#songInfo {
+    text-align: center;
+    margin-bottom: 10px;
+    min-height: 38px;
+}
+
+.song-anime {
+    font-size: 0.68em;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-title {
+    font-size: 0.9em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-sep {
+    color: #666;
+    font-weight: 300;
+}
+
+#songName:empty + .song-sep {
+    display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Boutons de controle                                                 */
+/* ------------------------------------------------------------------ */
 
 .controls {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    position: relative;
 }
 
 .btn {
-    background: hsl(300, 34%, 33%);
+    background: hsl(300, 34%, 30%);
     color: white;
     border: none;
-    padding: 10px;
-    margin: 5px;
+    padding: 0;
     cursor: pointer;
-    border-radius: 5px;
-}
-
-.btn:hover {
-    background: hsl(300, 34%, 33%);
-}
-
-#player {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #111;
-    padding: 10px;
+    border-radius: 50%;
+    font-size: 1.2em;
+    width: 52px;
+    height: 52px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
 }
 
-/* Bouton "Supprimer" en bas à droite */
+.btn:active {
+    background: hsl(300, 34%, 22%);
+    transform: scale(0.93);
+}
+
+.btn.active {
+    background: hsl(300, 55%, 48%);
+}
+
+.btn-secondary {
+    border-radius: 8px;
+    width: auto;
+    height: auto;
+    padding: 8px 14px;
+    font-size: 0.9em;
+    margin-bottom: 6px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Bouton vider la playlist                                            */
+/* ------------------------------------------------------------------ */
+
 .clear-button {
-    position: fixed;
-    bottom: 3px;
-    left: 3px;
-    padding: 10px 10px;
-    font-size: 10px;
-    background-color: hsl(300, 34%, 33%);
-    color: white;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    color: #555;
     border: none;
-    border-radius: 2px;
+    font-size: 1.1em;
     cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    line-height: 1;
 }
 
-.clear-button:hover {
-    background-color: hsl(300, 35%, 28%);
+.clear-button:active {
+    background: rgba(255, 255, 255, 0.06);
+    color: #aaa;
 }
