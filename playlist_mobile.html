@@ -12,6 +12,11 @@
 
     <!-- Zone scrollable : liste de chansons -->
     <div id="musicList">
+
+        <div class="mobile-nav">
+            <a href="index.html" class="back-button" aria-label="Retour au menu">⬅ Retour</a>
+        </div>
+
         <input type="file" id="fileInput" accept=".json" aria-label="Importer une playlist JSON">
         <button id="exportButton" class="btn btn-secondary" aria-label="Exporter la playlist en JSON">💾</button>
         <h2>Liste des chansons</h2>
@@ -20,28 +25,40 @@
     <!-- Barre de lecture fixee en bas -->
     <div id="mobile-player">
 
-        <video id="videoPlayer" controls aria-label="Lecteur video"></video>
-        <audio id="audioPlayer" controls style="display:none" aria-label="Lecteur audio"></audio>
+        <!-- Poignee : clic ou swipe bas pour replier, swipe haut pour ouvrir -->
+        <div class="player-handle" aria-label="Replier ou agrandir le lecteur"></div>
 
-        <div id="songInfo">
-            <p class="song-anime" id="animeName"></p>
-            <p class="song-title">
-                <span id="songName"></span>
-                <span class="song-sep" id="artistSep"> - </span>
-                <span id="artistName"></span>
-            </p>
+        <!-- Zone repliable -->
+        <div class="player-collapsible">
+            <video id="videoPlayer" controls aria-label="Lecteur video"></video>
+            <audio id="audioPlayer" controls style="display:none" aria-label="Lecteur audio"></audio>
+
+            <div class="history-box" id="history-box" style="display:none">
+                <div id="historyContainer"></div>
+            </div>
+
+            <div id="songInfo">
+                <p class="song-anime" id="animeName"></p>
+                <p class="song-title">
+                    <span id="songName"></span>
+                    <span class="song-sep"> - </span>
+                    <span id="artistName"></span>
+                </p>
+            </div>
         </div>
 
+        <!-- Controles toujours visibles -->
         <div class="controls">
             <button id="prevButton" class="btn" aria-label="Chanson precedente">⏮</button>
-            <button id="randomButton" class="btn" aria-label="Mode aleatoire">🔀</button>
+            <button id="randomButton" class="btn" aria-label="Activer ou desactiver le mode aleatoire">🎲</button>
+            <button id="repeatButton" class="btn" aria-label="Activer ou desactiver la repetition">♾️</button>
             <button id="nextButton" class="btn" aria-label="Chanson suivante">⏭</button>
+            <button id="toggle-history" class="btn btn-sm" aria-label="Afficher ou masquer l'historique">🎵</button>
         </div>
 
         <button id="clearButton" class="clear-button" aria-label="Vider la playlist">🗑️</button>
     </div>
 
-    <!-- Champ masque pour la compatibilite JS -->
     <span id="typeName" style="display:none"></span>
 
     <script>

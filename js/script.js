@@ -337,10 +337,15 @@
         exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
         exportBtn.addEventListener("click", exportPlaylist);
 
+        const importRow = document.createElement("div");
+        importRow.className = "import-row";
+        importRow.appendChild(fileInput);
+        importRow.appendChild(exportBtn);
+
         const heading = document.createElement("h2");
         heading.textContent = `Liste des chansons (${state.musicData.length})`;
 
-        list.replaceChildren(manager, fileInput, exportBtn, heading);
+        list.replaceChildren(manager, importRow, heading);
 
         if (state.musicData.length === 0) {
             const msg = document.createElement("p");
@@ -567,6 +572,26 @@
             if (e.code === "ArrowRight") playNext();
             if (e.code === "ArrowLeft")  playPrevious();
         });
+
+        // Swipe pour replier/ouvrir le player mobile
+        const mobilePlayer = document.getElementById("mobile-player");
+        const playerHandle = document.querySelector(".player-handle");
+        if (mobilePlayer) {
+            let touchStartY = 0;
+            mobilePlayer.addEventListener("touchstart", function(e) {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            mobilePlayer.addEventListener("touchend", function(e) {
+                const deltaY = e.changedTouches[0].clientY - touchStartY;
+                if (deltaY > 40) mobilePlayer.classList.add("collapsed");
+                else if (deltaY < -40) mobilePlayer.classList.remove("collapsed");
+            }, { passive: true });
+            if (playerHandle) {
+                playerHandle.addEventListener("click", function() {
+                    mobilePlayer.classList.toggle("collapsed");
+                });
+            }
+        }
 
     });
 })();
