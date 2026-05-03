@@ -36,7 +36,8 @@
         isRepeat: false,
         lastPlayedHistory: [],
         playlists: {},
-        activePlaylist: ""
+        activePlaylist: "",
+        searchQuery: ""
     };
 
     // -- Elements DOM --------------------------------------------------------
@@ -123,7 +124,10 @@
 
     function playRandomMusic() {
         if (state.musicData.length === 0) return;
-        playMusic(Math.floor(Math.random() * state.musicData.length));
+        if (state.musicData.length === 1) { playMusic(0); return; }
+        let next;
+        do { next = Math.floor(Math.random() * state.musicData.length); } while (next === state.currentIndex);
+        playMusic(next);
     }
 
     function updateSongInfo() {
@@ -137,8 +141,10 @@
     }
 
     function highlightCurrentSong() {
-        document.querySelectorAll(".music-item").forEach((item, index) => {
-            item.classList.toggle("active", index === state.currentIndex);
+        document.querySelectorAll(".music-item").forEach(item => {
+            const isActive = parseInt(item.dataset.index, 10) === state.currentIndex;
+            item.classList.toggle("active", isActive);
+            if (isActive) item.scrollIntoView({ block: "nearest", behavior: "smooth" });
         });
     }
 
@@ -225,6 +231,7 @@
         state.activePlaylist = trimmed;
         state.musicData = [];
         state.currentIndex = 0;
+        state.searchQuery = "";
         stopPlayer();
         savePlaylists();
         renderMusicList();
@@ -235,6 +242,7 @@
         state.activePlaylist = name;
         state.musicData = state.playlists[name];
         state.currentIndex = 0;
+        state.searchQuery = "";
         stopPlayer();
         savePlaylists();
         renderMusicList();
@@ -332,7 +340,8 @@
 
         const exportBtn = document.createElement("button");
         exportBtn.id = "exportButton";
-        exportBtn.className = "btn";
+        const isMobile = !!document.getElementById("mobile-player");
+        exportBtn.className = isMobile ? "btn btn-secondary" : "btn playlist-btn";
         exportBtn.textContent = "💾";
         exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
         exportBtn.addEventListener("click", exportPlaylist);
@@ -345,7 +354,18 @@
         const heading = document.createElement("h2");
         heading.textContent = `Liste des chansons (${state.musicData.length})`;
 
-        list.replaceChildren(manager, importRow, heading);
+        const searchInput = document.createElement("input");
+        searchInput.type = "search";
+        searchInput.className = "search-input";
+        searchInput.placeholder = "Rechercher…";
+        searchInput.setAttribute("aria-label", "Rechercher dans la playlist");
+        searchInput.value = state.searchQuery;
+        searchInput.addEventListener("input", function() {
+            state.searchQuery = this.value.toLowerCase().trim();
+            filterMusicItems();
+        });
+
+        list.replaceChildren(manager, importRow, heading, searchInput);
 
         if (state.musicData.length === 0) {
             const msg = document.createElement("p");
@@ -393,7 +413,37 @@
             list.appendChild(musicItem);
         });
 
+        filterMusicItems();
         highlightCurrentSong();
+    }
+
+    function filterMusicItems() {
+        const q = state.searchQuery;
+        document.querySelectorAll(".music-item").forEach(item => {
+            const idx = parseInt(item.dataset.index, 10);
+            const song = state.musicData[idx];
+            if (!song) return;
+            const match = !q ||
+                song.songName.toLowerCase().includes(q) ||
+                song.songArtist.toLowerCase().includes(q) ||
+                song.animeJPName.toLowerCase().includes(q);
+            item.style.display = match ? "" : "none";
+        });
+    }
+
+    function showToast(message) {
+        const existing = document.getElementById("toast-notification");
+        if (existing) existing.remove();
+        const toast = document.createElement("div");
+        toast.id = "toast-notification";
+        toast.className = "toast-notification";
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add("visible"));
+        setTimeout(() => {
+            toast.classList.remove("visible");
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
     }
 
     function handleFileUpload(event) {
@@ -412,12 +462,14 @@
                     alert("Aucune chanson valide trouvee dans le fichier.");
                     return;
                 }
-                if (valid.length < parsed.length) {
-                    alert(`${parsed.length - valid.length} entree(s) ignoree(s) (format incorrect).`);
-                }
                 state.musicData = state.musicData.concat(valid);
+                state.searchQuery = "";
                 savePlaylists();
                 renderMusicList();
+                const ignored = parsed.length - valid.length;
+                showToast(ignored > 0
+                    ? `${valid.length} chanson(s) ajoutée(s) — ${ignored} ignorée(s).`
+                    : `${valid.length} chanson(s) ajoutée(s).`);
             } catch (_) {
                 alert("Erreur lors du chargement du fichier JSON.");
             }
@@ -472,6 +524,7 @@
     }
 
     function clearAllMusic() {
+        if (!confirm("Vider toute la playlist ?")) return;
         state.musicData = [];
         savePlaylists();
         stopPlayer();

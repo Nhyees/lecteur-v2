@@ -345,3 +345,49 @@ video, audio {
     max-height: 0;
     opacity: 0;
 }
+
+.search-input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: #252525;
+    color: #f0f0f0;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    font-size: 0.85em;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: hsl(300, 34%, 40%);
+}
+
+.search-input::placeholder {
+    color: #666;
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #333;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 9999;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+}
+
+.toast-notification.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
