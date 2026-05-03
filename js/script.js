@@ -18,13 +18,11 @@
                 : "https://eudist.animemusicquiz.com/" + videoUrl;
             return { type: "video", url };
         }
-        if (song.audio) {
-            const url = song.audio.startsWith("http")
-                ? song.audio
-                : "https://eudist.animemusicquiz.com/" + song.audio;
-            return { type: "audio", url };
-        }
-        return { type: "audio", url: "" };
+        const audioUrl = song.audio || "";
+        const url = audioUrl.startsWith("http")
+            ? audioUrl
+            : "https://eudist.animemusicquiz.com/" + audioUrl;
+        return { type: "audio", url };
     }
 
     // -- Etat ----------------------------------------------------------------
@@ -86,16 +84,20 @@
         state.currentIndex = index;
         const song = state.musicData[state.currentIndex];
         const media = buildUrlAuto(song);
-        if (media.type === "video" && videoPlayer) {
-            videoPlayer.src = media.url;
-            videoPlayer.volume = state.savedVolume;
-            videoPlayer.style.display = "block";
-            if (audioPlayer) audioPlayer.style.display = "none";
-        } else if (audioPlayer) {
-            audioPlayer.src = media.url;
-            audioPlayer.volume = state.savedVolume;
-            audioPlayer.style.display = "block";
-            if (videoPlayer) videoPlayer.style.display = "none";
+        if (media.type === "video") {
+            if (audioPlayer) { audioPlayer.pause(); audioPlayer.src = ""; audioPlayer.style.display = "none"; }
+            if (videoPlayer) {
+                videoPlayer.src = media.url;
+                videoPlayer.volume = state.savedVolume;
+                videoPlayer.style.display = "block";
+            }
+        } else {
+            if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; videoPlayer.style.display = "none"; }
+            if (audioPlayer) {
+                audioPlayer.src = media.url;
+                audioPlayer.volume = state.savedVolume;
+                audioPlayer.style.display = "block";
+            }
         }
         updateSongInfo();
         highlightCurrentSong();
@@ -105,7 +107,7 @@
         if (state.musicData.length === 0) return;
         if (state.musicData[state.currentIndex]) updateHistory(state.currentIndex);
         prepareMusic(index);
-        const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
+        const active = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
         if (active) active.play().catch(() => {});
     }
 

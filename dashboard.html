@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
+    <title>Playlists Communautaires</title>
+    <link rel="stylesheet" href="css/style_dashboard.css">
+</head>
+<body>
+
+    <!-- ── Écran de connexion ─────────────────────────────────── -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-card">
+            <div class="login-icon">🎵</div>
+            <h1>Playlists Communautaires</h1>
+            <p class="login-sub">Entre ton pseudo pour accéder</p>
+            <div class="login-form">
+                <input type="text" id="pseudo-input" class="input-field"
+                       placeholder="Ton pseudo" maxlength="30" autocomplete="off">
+                <button id="login-btn" class="btn-primary">Entrer</button>
+            </div>
+            <p class="login-note">Aucun mot de passe · Sauvegardé localement</p>
+            <a href="index.html" class="login-back">⬅ Retour à l'accueil</a>
+        </div>
+    </div>
+
+    <!-- ── Application ───────────────────────────────────────── -->
+    <div id="app" class="app" style="display:none">
+
+        <header class="header">
+            <div class="header-left">
+                <a href="index.html" class="btn-ghost">⬅</a>
+                <span class="header-title">🎵 Playlists communautaires</span>
+            </div>
+            <div class="header-right">
+                <span class="user-chip">👤 <span id="user-pseudo"></span></span>
+                <button id="new-playlist-btn" class="btn-primary sm">+ Playlist</button>
+                <button id="theme-btn" class="btn-icon" aria-label="Changer de thème">🫧</button>
+                <button id="logout-btn" class="btn-ghost">Déconnexion</button>
+            </div>
+        </header>
+
+        <!-- Vue : liste des playlists -->
+        <div id="view-dashboard" class="view">
+            <div class="view-header">
+                <h2>Toutes les playlists</h2>
+                <span id="playlist-count" class="count-chip"></span>
+            </div>
+            <div id="playlist-grid" class="playlist-grid"></div>
+            <p id="empty-dashboard" class="empty-msg" style="display:none">
+                Aucune playlist pour l'instant — sois le premier ! 🎶
+            </p>
+        </div>
+
+        <!-- Vue : détail d'une playlist -->
+        <div id="view-playlist" class="view" style="display:none">
+            <div class="view-header">
+                <button id="back-btn" class="btn-ghost">⬅ Retour</button>
+                <div class="playlist-heading">
+                    <h2 id="detail-name"></h2>
+                    <p id="detail-desc" class="text-muted"></p>
+                    <span id="detail-owner" class="owner-chip"></span>
+                </div>
+                <div id="playlist-action-group" class="header-action-group" style="display:none">
+                    <button id="open-in-player-btn" class="btn-ghost">▶ Lecteur</button>
+                    <button id="export-json-btn"    class="btn-ghost">⬇ .json</button>
+                    <button id="delete-playlist-btn" class="btn-danger" style="display:none">🗑️ Supprimer</button>
+                </div>
+            </div>
+
+            <!-- Mini-lecteur -->
+            <div id="player-area" class="mini-player" style="display:none">
+                <p class="player-now-playing">En cours de lecture</p>
+                <span id="player-title" class="player-title"></span>
+                <video id="player-video" controls style="display:none"></video>
+                <audio id="player-audio" controls style="display:none"></audio>
+            </div>
+
+            <!-- Ajout de chanson -->
+            <div class="add-song-card">
+                <h3>Ajouter une chanson</h3>
+                <div class="import-json-row">
+                    <label class="import-json-label" for="json-file-input">📂 Importer un .json AMQ</label>
+                    <input type="file" id="json-file-input" accept=".json" style="display:none">
+                    <span class="import-sep">— ou manuellement ↓</span>
+                </div>
+                <div class="add-song-row add-song-meta">
+                    <input type="text" id="song-title-input"  class="input-field" placeholder="Titre">
+                    <input type="text" id="song-artist-input" class="input-field" placeholder="Artiste (optionnel)">
+                    <input type="text" id="song-anime-input"  class="input-field" placeholder="Anime (optionnel)">
+                    <input type="text" id="song-type-input"   class="input-field" placeholder="Type (ex: Opening 1)">
+                </div>
+                <div class="add-song-row">
+                    <input type="url"  id="song-url-input"    class="input-field" placeholder="URL AMQ (https://naedist…) *">
+                    <button id="add-song-btn" class="btn-primary">Ajouter</button>
+                </div>
+            </div>
+
+            <div id="song-list" class="song-list"></div>
+            <p id="empty-playlist" class="empty-msg" style="display:none">
+                Aucune chanson — ajoute-en une ! 🎵
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ── Modal : créer une playlist ────────────────────────── -->
+    <div id="modal-create" class="modal-overlay" style="display:none">
+        <div class="modal-card">
+            <h2>Nouvelle playlist</h2>
+            <div class="form-group">
+                <label for="create-name">Nom</label>
+                <input type="text" id="create-name" class="input-field"
+                       placeholder="Nom de la playlist" maxlength="60">
+            </div>
+            <div class="form-group">
+                <label for="create-desc">
+                    Description <span class="optional">(optionnel)</span>
+                </label>
+                <textarea id="create-desc" class="input-field" rows="3"
+                          placeholder="Une courte description…" maxlength="200"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-create-btn" class="btn-ghost">Annuler</button>
+                <button id="confirm-create-btn" class="btn-primary">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+    (function () {
+        // ── Config Supabase ──────────────────────────────────────────────────
+        const SUPABASE_URL = 'https://hrqfykhakqngavtnxaxw.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_5LFQPCK28SzPwlGOYQ_fuA_18Qt54T9';
+
+        // IMPORTANT : pour activer la suppression, ajoute ces politiques dans
+        // l'éditeur SQL de Supabase :
+        //
+        //   create policy "delete playlists" on playlists for delete using (true);
+        //   create policy "delete songs"     on songs     for delete using (true);
+
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const AMQ_BASES = [
+            'https://naedist.animemusicquiz.com/',
+            'https://eudist.animemusicquiz.com/',
+        ];
+        function stripAmqBase(url) {
+            for (const base of AMQ_BASES) {
+                if (url.startsWith(base)) return url.slice(base.length);
+            }
+            return url;
+        }
+
+
+        // ── Thèmes ────────────────────────────────────────────────────────────
+        const THEMES    = ['', 'theme-girly', 'theme-orange'];
+        const THEME_KEY = 'dashboard_theme';
+        const USER_KEY  = 'dashboard_user';
+
+        let themeIdx = parseInt(localStorage.getItem(THEME_KEY) ?? '0', 10);
+        if (isNaN(themeIdx)) themeIdx = 0;
+        applyTheme(themeIdx);
+
+        function applyTheme(idx) {
+            themeIdx = ((idx % THEMES.length) + THEMES.length) % THEMES.length;
+            document.body.className = THEMES[themeIdx];
+            localStorage.setItem(THEME_KEY, themeIdx);
+        }
+
+        // ── État ──────────────────────────────────────────────────────────────
+        const state = {
+            user:            null,
+            playlists:       [],
+            currentPlaylist: null,
+            songs:           []
+        };
+
+        // ── Refs DOM ──────────────────────────────────────────────────────────
+        const $  = id => document.getElementById(id);
+        const loginOverlay      = $('login-overlay');
+        const app               = $('app');
+        const pseudoInput       = $('pseudo-input');
+        const viewDashboard     = $('view-dashboard');
+        const viewPlaylist      = $('view-playlist');
+        const playlistGrid      = $('playlist-grid');
+        const playlistCount     = $('playlist-count');
+        const emptyDashboard    = $('empty-dashboard');
+        const detailName        = $('detail-name');
+        const detailDesc        = $('detail-desc');
+        const detailOwner       = $('detail-owner');
+        const deletePlaylistBtn    = $('delete-playlist-btn');
+        const playlistActionGroup  = $('playlist-action-group');
+        const playerArea        = $('player-area');
+        const playerTitle       = $('player-title');
+        const playerVideo       = $('player-video');
+        const playerAudio       = $('player-audio');
+        const songList          = $('song-list');
+        const emptyPlaylist     = $('empty-playlist');
+        const modalCreate       = $('modal-create');
+        const toastEl           = $('toast');
+        let toastTimer;
+
+        // ── Toast ─────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'info') {
+            clearTimeout(toastTimer);
+            toastEl.textContent = msg;
+            toastEl.className = `toast visible toast-${type}`;
+            toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 3000);
+        }
+
+        // ── Connexion ─────────────────────────────────────────────────────────
+        async function login(pseudo) {
+            pseudo = pseudo.trim();
+            if (!pseudo)         return showToast('Entre un pseudo', 'error');
+            if (pseudo.length > 30) return showToast('Pseudo trop long (max 30 car.)', 'error');
+
+            const { data: existing } = await db
+                .from('users')
+                .select('id, pseudo')
+                .eq('pseudo', pseudo)
+                .maybeSingle();
+
+            let user;
+            if (existing) {
+                user = existing;
+            } else {
+                const { data, error } = await db
+                    .from('users')
+                    .insert({ pseudo })
+                    .select('id, pseudo')
+                    .single();
+                if (error) return showToast('Erreur lors de la connexion', 'error');
+                user = data;
+            }
+
+            state.user = user;
+            localStorage.setItem(USER_KEY, JSON.stringify(user));
+            startApp();
+        }
+
+        function logout() {
+            localStorage.removeItem(USER_KEY);
+            state.user = null;
+            app.style.display = 'none';
+            loginOverlay.style.display = 'flex';
+            pseudoInput.value = '';
+        }
+
+        function startApp() {
+            loginOverlay.style.display = 'none';
+            app.style.display = 'flex';
+            $('user-pseudo').textContent = state.user.pseudo;
+            loadPlaylists();
+        }
+
+        // ── Playlists ─────────────────────────────────────────────────────────
+        async function loadPlaylists() {
+            const { data, error } = await db
+                .from('playlists')
+                .select('id, nom, description, user_id, users(pseudo)')
+                .order('id', { ascending: false });
+            if (error) return showToast('Erreur de chargement', 'error');
+            state.playlists = data || [];
+            renderPlaylists();
+        }
+
+        function renderPlaylists() {
+            playlistGrid.innerHTML = '';
+            const n = state.playlists.length;
+            playlistCount.textContent = `${n} playlist${n !== 1 ? 's' : ''}`;
+            emptyDashboard.style.display = n === 0 ? 'block' : 'none';
+
+            state.playlists.forEach(pl => {
+                const isOwner = state.user?.id === pl.user_id;
+                const card = document.createElement('div');
+                card.className = 'playlist-card';
+                card.innerHTML = `
+                    <div class="card-top">
+                        <h3 class="card-name">${esc(pl.nom)}</h3>
+                        ${isOwner
+                            ? `<button class="card-del-btn" title="Supprimer cette playlist">🗑️</button>`
+                            : ''}
+                    </div>
+                    <p class="card-desc">${pl.description
+                        ? esc(pl.description)
+                        : '<em>Pas de description</em>'}</p>
+                    <div class="card-foot">
+                        <span class="card-owner">👤 ${esc(pl.users?.pseudo || '?')}</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                `;
+                card.querySelector('.card-del-btn')?.addEventListener('click', e => {
+                    e.stopPropagation();
+                    deletePlaylist(pl.id, null);
+                });
+                card.addEventListener('click', () => openPlaylist(pl));
+                playlistGrid.appendChild(card);
+            });
+        }
+
+        async function createPlaylist() {
+            const nom = $('create-name').value.trim();
+            if (!nom) return showToast('Donne un nom à ta playlist', 'error');
+            const desc = $('create-desc').value.trim();
+
+            const { data, error } = await db
+                .from('playlists')
+                .insert({ nom, description: desc || null, user_id: state.user.id })
+                .select('id, nom, description, user_id, users(pseudo)')
+                .single();
+            if (error) return showToast('Erreur lors de la création', 'error');
+
+            state.playlists.unshift(data);
+            renderPlaylists();
+            closeCreateModal();
+            showToast('Playlist créée !', 'success');
+        }
+
+        async function deletePlaylist(id, onDone) {
+            if (!confirm('Supprimer cette playlist et toutes ses chansons ?')) return;
+            await db.from('songs').delete().eq('playlist_id', id);
+            const { error } = await db.from('playlists').delete().eq('id', id);
+            if (error) return showToast('Erreur lors de la suppression (vérifie les politiques Supabase)', 'error');
+            state.playlists = state.playlists.filter(p => p.id !== id);
+            renderPlaylists();
+            showToast('Playlist supprimée', 'info');
+            if (onDone) onDone();
+        }
+
+        // ── Détail playlist ───────────────────────────────────────────────────
+        async function openPlaylist(pl) {
+            state.currentPlaylist = pl;
+            detailName.textContent  = pl.nom;
+            detailDesc.textContent  = pl.description || '';
+            detailOwner.textContent = `👤 ${pl.users?.pseudo || '?'}`;
+            playlistActionGroup.style.display = 'flex';
+            deletePlaylistBtn.style.display =
+                state.user?.id === pl.user_id ? 'inline-flex' : 'none';
+
+            viewDashboard.style.display = 'none';
+            viewPlaylist.style.display  = 'block';
+            await loadSongs(pl.id);
+        }
+
+        async function loadSongs(playlistId) {
+            const { data, error } = await db
+                .from('songs')
+                .select('id, titre, url, song_data, user_id, users(pseudo)')
+                .eq('playlist_id', playlistId)
+                .order('id', { ascending: true });
+            if (error) return showToast('Erreur chargement chansons', 'error');
+            state.songs = data || [];
+            renderSongs();
+        }
+
+        function renderSongs() {
+            songList.innerHTML = '';
+            emptyPlaylist.style.display = state.songs.length === 0 ? 'block' : 'none';
+            const isOwner = state.user?.id === state.currentPlaylist?.user_id;
+
+            state.songs.forEach((song, i) => {
+                const sd = song.song_data;
+                const subtitle = sd
+                    ? [sd.animeJPName, sd.songType].filter(Boolean).join(' · ') || `ajouté par ${esc(song.users?.pseudo || '?')}`
+                    : `ajouté par ${esc(song.users?.pseudo || '?')}`;
+                const item = document.createElement('div');
+                item.className = 'song-item';
+                item.innerHTML = `
+                    <span class="song-num">${i + 1}</span>
+                    <div class="song-meta">
+                        <span class="song-title">${esc(song.titre)}</span>
+                        <span class="song-by">${esc(subtitle)}</span>
+                    </div>
+                    <div class="song-btns">
+                        <button class="btn-play" title="Lire">▶</button>
+                        ${isOwner
+                            ? `<button class="btn-icon song-del" title="Supprimer">❌</button>`
+                            : ''}
+                    </div>
+                `;
+                item.querySelector('.btn-play').addEventListener('click', () =>
+                    playSong(song.url, song.titre, item));
+                item.querySelector('.song-del')?.addEventListener('click', () =>
+                    deleteSong(song.id));
+                songList.appendChild(item);
+            });
+        }
+
+        async function addSong() {
+            const titre  = $('song-title-input').value.trim();
+            const url    = stripAmqBase($('song-url-input').value.trim());
+            const artist = $('song-artist-input').value.trim();
+            const anime  = $('song-anime-input').value.trim();
+            const type   = $('song-type-input').value.trim();
+            if (!titre || !url) return showToast("Remplis le titre et l'URL", 'error');
+
+            const song_data = {
+                songName: titre,
+                ...(artist && { songArtist: artist }),
+                ...(anime  && { animeJPName: anime }),
+                ...(type   && { songType: type }),
+                HQ: url
+            };
+
+            const { data, error } = await db
+                .from('songs')
+                .insert({ titre, url, song_data, playlist_id: state.currentPlaylist.id, user_id: state.user.id })
+                .select('id, titre, url, song_data, user_id, users(pseudo)')
+                .single();
+            if (error) return showToast("Erreur lors de l'ajout", 'error');
+
+            state.songs.push(data);
+            renderSongs();
+            $('song-title-input').value  = '';
+            $('song-url-input').value    = '';
+            $('song-artist-input').value = '';
+            $('song-anime-input').value  = '';
+            $('song-type-input').value   = '';
+            showToast('Chanson ajoutée !', 'success');
+        }
+
+        async function deleteSong(id) {
+            const { error } = await db.from('songs').delete().eq('id', id);
+            if (error) return showToast('Erreur lors de la suppression', 'error');
+            state.songs = state.songs.filter(s => s.id !== id);
+            renderSongs();
+            showToast('Chanson supprimée', 'info');
+        }
+
+        // ── Mini-lecteur ──────────────────────────────────────────────────────
+        function playSong(url, titre, itemEl) {
+            const fullUrl = url.startsWith('http')
+                ? url
+                : 'https://eudist.animemusicquiz.com/' + url;
+            const isVideo = /\.(mp4|webm|ogv)(\?|$)/i.test(fullUrl);
+
+            document.querySelectorAll('.song-item.playing')
+                .forEach(el => el.classList.remove('playing'));
+            itemEl.classList.add('playing');
+
+            playerTitle.textContent  = titre;
+            playerArea.style.display = 'block';
+
+            if (isVideo) {
+                playerAudio.pause();
+                playerAudio.style.display = 'none';
+                playerVideo.src           = fullUrl;
+                playerVideo.style.display = 'block';
+                playerVideo.play().catch(() => {});
+            } else {
+                playerVideo.pause();
+                playerVideo.style.display = 'none';
+                playerAudio.src           = fullUrl;
+                playerAudio.style.display = 'block';
+                playerAudio.play().catch(() => {});
+            }
+        }
+
+        function stopPlayer() {
+            playerVideo.pause();
+            playerAudio.pause();
+            playerVideo.src          = '';
+            playerAudio.src          = '';
+            playerArea.style.display = 'none';
+            document.querySelectorAll('.song-item.playing')
+                .forEach(el => el.classList.remove('playing'));
+        }
+
+        // ── Import / Export / Lecteur ─────────────────────────────────────────
+        function songToAMQ(song) {
+            if (song.song_data) return song.song_data;
+            return { songName: song.titre, audio: song.url };
+        }
+
+        async function addSongsFromJSON(file) {
+            let songs;
+            try {
+                const text = await file.text();
+                songs = JSON.parse(text);
+            } catch {
+                return showToast('Fichier JSON invalide', 'error');
+            }
+            if (!Array.isArray(songs)) songs = [songs];
+
+            let added = 0;
+            for (const s of songs) {
+                const titre = s.songName || s.titre || '?';
+                const url   = stripAmqBase(s.HQ || s.MQ || s.audio || s.url || '');
+                if (!url) continue;
+                const { data, error } = await db
+                    .from('songs')
+                    .insert({ titre, url, song_data: s,
+                              playlist_id: state.currentPlaylist.id,
+                              user_id: state.user.id })
+                    .select('id, titre, url, song_data, user_id, users(pseudo)')
+                    .single();
+                if (!error) { state.songs.push(data); added++; }
+            }
+            renderSongs();
+            showToast(`${added} chanson${added !== 1 ? 's' : ''} importée${added !== 1 ? 's' : ''} !`, 'success');
+        }
+
+        function openInPlayer() {
+            if (!state.songs.length) return showToast('Playlist vide', 'error');
+            stopPlayer();
+            const amqSongs = state.songs.map(songToAMQ);
+            const plName   = state.currentPlaylist.nom;
+            let playlists  = {};
+            try { playlists = JSON.parse(localStorage.getItem('playlists') || '{}'); } catch {}
+            playlists[plName] = amqSongs;
+            localStorage.setItem('playlists', JSON.stringify(playlists));
+            localStorage.setItem('activePlaylist', plName);
+            window.open('playlist.html', '_blank');
+        }
+
+        function exportJSON() {
+            if (!state.songs.length) return showToast('Playlist vide', 'error');
+            const amqSongs = state.songs.map(songToAMQ);
+            const blob = new Blob([JSON.stringify(amqSongs, null, 2)], { type: 'application/json' });
+            const a    = document.createElement('a');
+            a.href     = URL.createObjectURL(blob);
+            a.download = `${state.currentPlaylist.nom}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ── Modal ─────────────────────────────────────────────────────────────
+        function openCreateModal() {
+            $('create-name').value = '';
+            $('create-desc').value = '';
+            modalCreate.style.display = 'flex';
+            setTimeout(() => $('create-name').focus(), 50);
+        }
+
+        function closeCreateModal() {
+            modalCreate.style.display = 'none';
+        }
+
+        // ── Échappement HTML ──────────────────────────────────────────────────
+        function esc(str) {
+            return String(str)
+                .replace(/&/g,  '&amp;')
+                .replace(/</g,  '&lt;')
+                .replace(/>/g,  '&gt;')
+                .replace(/"/g,  '&quot;');
+        }
+
+        // ── Événements ────────────────────────────────────────────────────────
+        $('login-btn').addEventListener('click', () => login(pseudoInput.value));
+        pseudoInput.addEventListener('keydown', e => e.key === 'Enter' && login(pseudoInput.value));
+
+        $('logout-btn').addEventListener('click', logout);
+        $('theme-btn').addEventListener('click', () => applyTheme(themeIdx + 1));
+        $('new-playlist-btn').addEventListener('click', openCreateModal);
+
+        $('back-btn').addEventListener('click', () => {
+            stopPlayer();
+            playlistActionGroup.style.display = 'none';
+            viewPlaylist.style.display  = 'none';
+            viewDashboard.style.display = 'block';
+        });
+
+        deletePlaylistBtn.addEventListener('click', () =>
+            deletePlaylist(state.currentPlaylist.id, () => {
+                stopPlayer();
+                playlistActionGroup.style.display = 'none';
+                viewPlaylist.style.display  = 'none';
+                viewDashboard.style.display = 'block';
+            })
+        );
+
+        $('add-song-btn').addEventListener('click', addSong);
+        $('song-url-input').addEventListener('keydown', e => e.key === 'Enter' && addSong());
+
+        $('open-in-player-btn').addEventListener('click', openInPlayer);
+        $('export-json-btn').addEventListener('click', exportJSON);
+        $('json-file-input').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) { addSongsFromJSON(file); e.target.value = ''; }
+        });
+
+        $('cancel-create-btn').addEventListener('click', closeCreateModal);
+        $('confirm-create-btn').addEventListener('click', createPlaylist);
+        $('create-name').addEventListener('keydown', e => e.key === 'Enter' && createPlaylist());
+        modalCreate.addEventListener('click', e => e.target === modalCreate && closeCreateModal());
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        const savedUser = localStorage.getItem(USER_KEY);
+        if (savedUser) {
+            try {
+                state.user = JSON.parse(savedUser);
+                startApp();
+            } catch {
+                loginOverlay.style.display = 'flex';
+            }
+        } else {
+            loginOverlay.style.display = 'flex';
+        }
+
+    })();
+    </script>
+
+</body>
+</html>
