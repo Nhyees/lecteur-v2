@@ -327,6 +327,14 @@
         deleteBtn.setAttribute("aria-label", "Supprimer la playlist");
         deleteBtn.addEventListener("click", deletePlaylist);
 
+        if (document.getElementById("mobile-player")) {
+            const dashLink = document.createElement("a");
+            dashLink.href = "dashboard.html";
+            dashLink.textContent = "🌸";
+            dashLink.className = "btn playlist-btn";
+            dashLink.setAttribute("aria-label", "Playlists communautaires");
+            manager.appendChild(dashLink);
+        }
         manager.appendChild(select);
         manager.appendChild(newBtn);
         manager.appendChild(renameBtn);
