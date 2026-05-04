@@ -41,6 +41,25 @@ body.theme-girly {
     --chip-text:  #8a3060;
 }
 
+/* ── Thème Aria (bleu océan) ──────────────────────────────────── */
+body.theme-aria {
+    --bg:         linear-gradient(150deg, #071624 0%, #0c3252 55%, #0e6680 100%);
+    --bg-2:       #0a1e35;
+    --bg-card:    #0d2840;
+    --bg-input:   #0c3252;
+    --text:       #c8e8f8;
+    --text-muted: #6aaccc;
+    --accent:     #1565c0;
+    --accent-h:   #42a5f5;
+    --accent-fg:  #e8f4ff;
+    --danger:     #c62828;
+    --danger-h:   #8d1919;
+    --border:     rgba(33,118,174,.35);
+    --shadow:     0 2px 12px rgba(0,0,0,.4);
+    --chip-bg:    #0c3252;
+    --chip-text:  #7ec8e8;
+}
+
 /* ── Thème orange ─────────────────────────────────────────────── */
 body.theme-orange {
     --bg:         linear-gradient(135deg, #ffcc80, #ff7043);

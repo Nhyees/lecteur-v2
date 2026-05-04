@@ -80,6 +80,10 @@ body:hover ::-webkit-scrollbar-thumb {
     color: #aaa;
 }
 
+.music-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
 .music-item.active {
     background-color: hsl(300, 34%, 33%);
     font-weight: bold;
@@ -328,6 +332,7 @@ video {
     border-radius: 6px;
     padding: 6px 8px;
     font-size: 0.9em;
+    font-family: inherit;
     cursor: pointer;
 }
 

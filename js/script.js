@@ -1,8 +1,8 @@
 (function() {
     // -- Constantes ----------------------------------------------------------
     const HISTORY_MAX = 4;
-    const THEMES = ["css/style.css", "css/style_girly.css", "css/style_orange.css"];
-    const THEME_IMAGES = ["", "img/image_ran_shinichi.png", "img/image_makeine.png"];
+    const THEMES = ["css/style.css", "css/style_girly.css", "css/style_orange.css", "css/style_aria.css"];
+    const THEME_IMAGES = ["", "img/image_ran_shinichi.png", "img/image_makeine.png", "img/aria.png"];
     const STORAGE_KEY = "playlists";
     const ACTIVE_KEY  = "activePlaylist";
 
@@ -332,12 +332,14 @@
         renameBtn.addEventListener("click", renamePlaylist);
 
         const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "❌";
+        deleteBtn.textContent = "🗑️";
         deleteBtn.className = "btn playlist-btn";
         deleteBtn.setAttribute("aria-label", "Supprimer la playlist");
         deleteBtn.addEventListener("click", deletePlaylist);
 
-        if (document.getElementById("mobile-player")) {
+        const isMobile = !!document.getElementById("mobile-player");
+
+        if (isMobile) {
             const dashLink = document.createElement("a");
             dashLink.href = "dashboard.html";
             dashLink.textContent = "🌸";
@@ -350,7 +352,15 @@
         manager.appendChild(renameBtn);
         manager.appendChild(deleteBtn);
 
-        // Controles d'import / export
+        const exportBtn = document.createElement("button");
+        exportBtn.id = "exportButton";
+        exportBtn.className = "btn playlist-btn";
+        exportBtn.textContent = "💾";
+        exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
+        exportBtn.addEventListener("click", exportPlaylist);
+        manager.appendChild(exportBtn);
+
+        // Controles d'import
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.id = "fileInput";
@@ -358,18 +368,9 @@
         fileInput.setAttribute("aria-label", "Importer une playlist JSON");
         fileInput.addEventListener("change", handleFileUpload);
 
-        const exportBtn = document.createElement("button");
-        exportBtn.id = "exportButton";
-        const isMobile = !!document.getElementById("mobile-player");
-        exportBtn.className = isMobile ? "btn btn-secondary" : "btn playlist-btn";
-        exportBtn.textContent = "💾";
-        exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
-        exportBtn.addEventListener("click", exportPlaylist);
-
         const importRow = document.createElement("div");
         importRow.className = "import-row";
         importRow.appendChild(fileInput);
-        importRow.appendChild(exportBtn);
 
         const heading = document.createElement("h2");
         heading.textContent = `Liste des chansons (${state.musicData.length})`;
@@ -485,7 +486,7 @@
                 }
                 const valid = parsed.filter(isValidSong);
                 if (valid.length === 0) {
-                    alert("Aucune chanson valide trouvee dans le fichier.");
+                    alert("Aucune chanson valide trouvée dans le fichier.");
                     return;
                 }
                 state.musicData = state.musicData.concat(valid);
