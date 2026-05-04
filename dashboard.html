@@ -577,6 +577,13 @@
                 playerAudio.style.display = 'none';
                 playerVideo.src           = fullUrl;
                 playerVideo.style.display = 'block';
+                playerVideo.addEventListener('error', function() {
+                    playerVideo.src           = '';
+                    playerVideo.style.display = 'none';
+                    playerAudio.src           = fullUrl;
+                    playerAudio.style.display = 'block';
+                    playerAudio.play().catch(() => {});
+                }, { once: true });
                 playerVideo.play().catch(() => {});
             } else {
                 playerVideo.pause();

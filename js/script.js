@@ -79,7 +79,7 @@
     }
 
     // -- Lecteur -------------------------------------------------------------
-    function prepareMusic(index) {
+    function prepareMusic(index, autoPlay) {
         if (state.musicData.length === 0) return;
         state.currentIndex = index;
         const song = state.musicData[state.currentIndex];
@@ -90,6 +90,16 @@
                 videoPlayer.src = media.url;
                 videoPlayer.volume = state.savedVolume;
                 videoPlayer.style.display = "block";
+                videoPlayer.addEventListener("error", function() {
+                    videoPlayer.src = "";
+                    videoPlayer.style.display = "none";
+                    if (audioPlayer) {
+                        audioPlayer.src = media.url;
+                        audioPlayer.volume = state.savedVolume;
+                        audioPlayer.style.display = "block";
+                        if (autoPlay) audioPlayer.play().catch(function() {});
+                    }
+                }, { once: true });
             }
         } else {
             if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; videoPlayer.style.display = "none"; }
@@ -106,7 +116,7 @@
     function playMusic(index) {
         if (state.musicData.length === 0) return;
         if (state.musicData[state.currentIndex]) updateHistory(state.currentIndex);
-        prepareMusic(index);
+        prepareMusic(index, true);
         const active = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
         if (active) active.play().catch(() => {});
     }
