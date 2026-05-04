@@ -322,7 +322,7 @@
         renameBtn.addEventListener("click", renamePlaylist);
 
         const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "🗑️";
+        deleteBtn.textContent = "❌";
         deleteBtn.className = "btn playlist-btn";
         deleteBtn.setAttribute("aria-label", "Supprimer la playlist");
         deleteBtn.addEventListener("click", deletePlaylist);
@@ -392,7 +392,13 @@
             musicItem.dataset.index = index;
 
             const h3 = document.createElement("h3");
-            h3.textContent = `${music.songName} - ${music.songArtist}`;
+            h3.textContent = music.songName;
+            if (music.songArtist) {
+                const artistTag = document.createElement("span");
+                artistTag.className = "song-artist-tag";
+                artistTag.textContent = ` by ${music.songArtist}`;
+                h3.appendChild(artistTag);
+            }
 
             const p = document.createElement("p");
             const animeLabel = document.createElement("strong");
@@ -556,6 +562,7 @@
         const nextIdx = (currentIdx + 1) % THEMES.length;
         themeLink.setAttribute("href", THEMES[nextIdx]);
         localStorage.setItem("selectedTheme", THEMES[nextIdx]);
+        localStorage.setItem("dashboard_theme", nextIdx);
         const imgSrc = THEME_IMAGES[nextIdx];
         setFloatingImage(imgSrc);
         localStorage.setItem("selectedImage", imgSrc);

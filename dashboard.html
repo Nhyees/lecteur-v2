@@ -32,8 +32,8 @@
 
         <header class="header">
             <div class="header-left">
-                <a href="#" onclick="history.length > 1 ? history.back() : location.href='index.html'; return false;" class="btn-ghost">⬅</a>
-                <span class="header-title">🌸</span>
+                <a href="playlist.html" class="btn-ghost">⬅</a>
+                <span class="header-title"></span>
             </div>
             <div class="header-right">
                 <button id="login-header-btn" class="btn-primary sm" style="display:none">👤</button>
@@ -49,6 +49,13 @@
             <div class="view-header">
                 <h2>Toutes les playlists</h2>
                 <span id="playlist-count" class="count-chip"></span>
+            </div>
+            <div class="playlist-toolbar">
+                <input type="text" id="playlist-search" class="input-field playlist-search-input" placeholder="Rechercher...">
+                <div class="playlist-sort">
+                    <button class="sort-btn pl-sort-btn" data-plsort="update">Update</button>
+                    <button class="sort-btn pl-sort-btn active" data-plsort="title">Titre</button>
+                </div>
             </div>
             <div id="playlist-grid" class="playlist-grid"></div>
             <p id="empty-dashboard" class="empty-msg" style="display:none">
@@ -70,10 +77,10 @@
                 <div class="detail-right">
                     <span id="detail-owner" class="owner-chip"></span>
                     <div id="playlist-action-group" class="header-action-group" style="display:none">
-                        <button id="open-in-player-btn" class="btn-ghost">▶ Lecteur</button>
+                        <button id="open-in-player-btn" class="btn-ghost">+ Ajouter</button>
                         <button id="export-json-btn"    class="btn-ghost">⬇ .json</button>
                         <button id="edit-desc-btn"      class="btn-ghost" style="display:none">Modifier</button>
-                        <button id="delete-playlist-btn" class="btn-danger" style="display:none">🗑️ Supprimer</button>
+                        <button id="delete-playlist-btn" class="btn-danger" style="display:none">Supprimer</button>
                     </div>
                 </div>
             </div>
@@ -118,7 +125,7 @@
 
             <div id="song-list" class="song-list"></div>
             <p id="empty-playlist" class="empty-msg" style="display:none">
-                Aucune chanson — ajoute-en une ! 🎵
+                Aucune chanson.
             </p>
         </div>
 
@@ -198,21 +205,28 @@
 
 
         // ── Thèmes ────────────────────────────────────────────────────────────
-        const THEMES    = ['', 'theme-girly', 'theme-orange'];
-        const THEME_KEY = 'dashboard_theme';
-        const USER_KEY  = 'dashboard_user';
+        const THEMES     = ['', 'theme-girly', 'theme-orange'];
+        const THEME_CSS  = ['css/style.css', 'css/style_girly.css', 'css/style_orange.css'];
+        const THEME_KEY  = 'dashboard_theme';
+        const USER_KEY   = 'dashboard_user';
 
         let themeIdx = parseInt(localStorage.getItem(THEME_KEY) ?? '0', 10);
         if (isNaN(themeIdx)) themeIdx = 0;
+        // Sync depuis le lecteur si plus récent
+        const savedCss = localStorage.getItem('selectedTheme');
+        if (savedCss) { const ci = THEME_CSS.indexOf(savedCss); if (ci !== -1) themeIdx = ci; }
         applyTheme(themeIdx);
 
         function applyTheme(idx) {
             themeIdx = ((idx % THEMES.length) + THEMES.length) % THEMES.length;
             document.body.className = THEMES[themeIdx];
             localStorage.setItem(THEME_KEY, themeIdx);
+            localStorage.setItem('selectedTheme', THEME_CSS[themeIdx]);
         }
 
         let sortMode = 'anime';
+        let plSortMode = 'title';
+        let plSearch = '';
 
         // ── État ──────────────────────────────────────────────────────────────
         const state = {
@@ -337,11 +351,20 @@
 
         function renderPlaylists() {
             playlistGrid.innerHTML = '';
-            const n = state.playlists.length;
+            const q = plSearch.toLowerCase();
+            let list = q
+                ? state.playlists.filter(pl => pl.nom.toLowerCase().includes(q) || (pl.users?.pseudo || '').toLowerCase().includes(q))
+                : [...state.playlists];
+            if (plSortMode === 'title') {
+                list.sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
+            } else {
+                list.sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+            }
+            const n = list.length;
             playlistCount.textContent = `${n} playlist${n !== 1 ? 's' : ''}`;
             emptyDashboard.style.display = n === 0 ? 'block' : 'none';
 
-            state.playlists.forEach(pl => {
+            list.forEach(pl => {
                 const isOwner = state.user?.id === pl.user_id;
                 const card = document.createElement('div');
                 card.className = 'playlist-card';
@@ -422,6 +445,14 @@
                 .order('id', { ascending: true });
             if (error) return showToast('Erreur chargement chansons', 'error');
             state.songs = data || [];
+            const ownerPseudo = state.currentPlaylist.users?.pseudo || '?';
+            const contributors = [...new Set(
+                state.songs
+                    .map(s => s.users?.pseudo)
+                    .filter(p => p && p !== ownerPseudo)
+            )];
+            const allNames = [ownerPseudo, ...contributors].join(' & ');
+            detailOwner.textContent = `By ${allNames}`;
             renderSongs();
         }
 
@@ -474,6 +505,14 @@
             });
         }
 
+        async function touchPlaylistUpdatedAt() {
+            const now = new Date().toISOString();
+            await db.from('playlists').update({ updated_at: now }).eq('id', state.currentPlaylist.id);
+            state.currentPlaylist.updated_at = now;
+            const idx = state.playlists.findIndex(p => p.id === state.currentPlaylist.id);
+            if (idx !== -1) state.playlists[idx].updated_at = now;
+        }
+
         async function addSong() {
             const titre  = $('song-title-input').value.trim();
             const url    = stripAmqBase($('song-url-input').value.trim());
@@ -498,6 +537,7 @@
             if (error) return showToast("Erreur lors de l'ajout", 'error');
 
             state.songs.push(data);
+            await touchPlaylistUpdatedAt();
             renderSongs();
             $('song-title-input').value  = '';
             $('song-url-input').value    = '';
@@ -511,6 +551,7 @@
             const { error } = await db.from('songs').delete().eq('id', id);
             if (error) return showToast('Erreur lors de la suppression', 'error');
             state.songs = state.songs.filter(s => s.id !== id);
+            await touchPlaylistUpdatedAt();
             renderSongs();
             showToast('Chanson supprimée', 'info');
         }
@@ -525,7 +566,7 @@
 
             document.querySelectorAll('.song-item.playing')
                 .forEach(el => el.classList.remove('playing'));
-            itemEl.classList.add('playing');
+            if (itemEl) itemEl.classList.add('playing');
 
             playerTitle.textContent = titre;
             const artist   = sd?.songArtist || '';
@@ -589,6 +630,7 @@
                     .single();
                 if (!error) { state.songs.push(data); added++; }
             }
+            if (added > 0) await touchPlaylistUpdatedAt();
             renderSongs();
             showToast(`${added} chanson${added !== 1 ? 's' : ''} importée${added !== 1 ? 's' : ''} !`, 'success');
         }
@@ -628,7 +670,7 @@
                 localStorage.setItem('activeSongIndex', state.currentSongIdx);
 
             const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            window.open(isMobile ? 'playlist_mobile.html' : 'playlist.html', '_blank');
+            location.href = isMobile ? 'playlist_mobile.html' : 'playlist.html';
         }
 
         function exportJSON() {
@@ -759,13 +801,27 @@
         $('create-name').addEventListener('keydown', e => e.key === 'Enter' && createPlaylist());
         modalCreate.addEventListener('click', e => e.target === modalCreate && closeCreateModal());
 
-        document.querySelectorAll('.sort-btn').forEach(btn => {
+        document.querySelectorAll('.sort-btn[data-sort]').forEach(btn => {
             btn.addEventListener('click', () => {
                 sortMode = btn.dataset.sort;
-                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.sort-btn[data-sort]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 renderSongs();
             });
+        });
+
+        document.querySelectorAll('.pl-sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                plSortMode = btn.dataset.plsort;
+                document.querySelectorAll('.pl-sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderPlaylists();
+            });
+        });
+
+        $('playlist-search').addEventListener('input', e => {
+            plSearch = e.target.value.trim();
+            renderPlaylists();
         });
 
         $('cancel-edit-btn').addEventListener('click', closeEditModal);

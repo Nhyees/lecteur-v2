@@ -308,6 +308,27 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     white-space: nowrap;
 }
 
+/* ── Toolbar playlists ────────────────────────────────────────── */
+.playlist-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.playlist-search-input {
+    flex: 1;
+    min-width: 180px;
+    width: auto;
+}
+
+.playlist-sort {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
 /* ── Grille playlists ─────────────────────────────────────────── */
 .playlist-grid {
     display: grid;

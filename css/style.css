@@ -162,6 +162,19 @@ audio {
     font-size: 0.85rem;
 }
 
+.song-by-sep {
+    opacity: 0.5;
+    font-size: 0.85em;
+    font-weight: normal;
+}
+
+.song-artist-tag {
+    font-size: 0.82em;
+    font-weight: normal;
+    opacity: 0.7;
+    color: #aaa;
+}
+
 video {
     width: 100%;
     max-width: 100%;

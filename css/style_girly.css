@@ -180,6 +180,19 @@ audio {
     width: 100%;
 }
 
+.song-by-sep {
+    opacity: 0.5;
+    font-size: 0.85em;
+    font-weight: normal;
+}
+
+.song-artist-tag {
+    font-size: 0.82em;
+    font-weight: normal;
+    opacity: 0.7;
+    color: #a070a0;
+}
+
 #songInfo {
     background-color: #fce4ec;
     color: #4a235a;

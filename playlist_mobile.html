@@ -13,7 +13,6 @@
     <!-- Zone scrollable : liste de chansons -->
     <div id="musicList">
 
-        <div class="mobile-nav"></div>
 
         <input type="file" id="fileInput" accept=".json" aria-label="Importer une playlist JSON">
         <button id="exportButton" class="btn btn-secondary" aria-label="Exporter la playlist en JSON">💾</button>
@@ -48,14 +47,13 @@
         <!-- Controles toujours visibles -->
         <div class="controls">
             <button id="prevButton" class="btn" aria-label="Chanson precedente">⏮</button>
-            <button id="playPauseButton" class="btn" aria-label="Lire ou mettre en pause">▶</button>
             <button id="randomButton" class="btn" aria-label="Activer ou desactiver le mode aleatoire">🎲</button>
+            <button id="playPauseButton" class="btn" aria-label="Lire ou mettre en pause">▶</button>
             <button id="repeatButton" class="btn" aria-label="Activer ou desactiver la repetition">♾️</button>
             <button id="nextButton" class="btn" aria-label="Chanson suivante">⏭</button>
-            <button id="toggle-history" class="btn btn-sm" aria-label="Afficher ou masquer l'historique">🎵</button>
         </div>
 
-        <button id="clearButton" class="clear-button" aria-label="Vider la playlist">🗑️</button>
+        <button id="toggle-history" class="clear-button" aria-label="Afficher ou masquer l'historique">🎵</button>
     </div>
 
     <span id="typeName" style="display:none"></span>
