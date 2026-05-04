@@ -760,7 +760,6 @@
         $('password-input').addEventListener('keydown', e => e.key === 'Enter' && login(pseudoInput.value, $('password-input').value));
 
         $('logout-btn').addEventListener('click', logout);
-        $('theme-btn').addEventListener('click', () => applyTheme(themeIdx + 1));
         $('new-playlist-btn').addEventListener('click', openCreateModal);
 
         $('back-btn').addEventListener('click', () => {
