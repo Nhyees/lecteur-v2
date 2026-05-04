@@ -369,14 +369,11 @@
                 const card = document.createElement('div');
                 card.className = 'playlist-card';
                 card.innerHTML = `
-                    <div class="card-top">
-                        <h3 class="card-name">${esc(pl.nom)}</h3>
-                    </div>
+                    <h3 class="card-name">${esc(pl.nom)}</h3>
                     <p class="card-desc">${pl.description ? esc(pl.description) : ''}</p>
-                    <div class="card-dates">updated ${pl.updated_at ? formatDate(pl.updated_at) : formatDate(pl.created_at)}</div>
                     <div class="card-foot">
                         <span class="card-owner">👤 ${esc(pl.users?.pseudo || '?')}</span>
-                        <span class="card-arrow">→</span>
+                        <span class="card-updated">${formatDateISO(pl.updated_at || pl.created_at)}</span>
                     </div>
                 `;
                 card.addEventListener('click', () => openPlaylist(pl));
@@ -735,6 +732,11 @@
         function formatDate(iso) {
             if (!iso) return '-';
             return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateISO(iso) {
+            if (!iso) return '-';
+            return new Date(iso).toISOString().slice(0, 10);
         }
 
         // ── Échappement HTML ──────────────────────────────────────────────────

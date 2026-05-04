@@ -340,30 +340,24 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px 18px 14px;
+    padding: 16px 16px 14px;
     cursor: pointer;
-    transition: box-shadow .2s, transform .15s;
+    transition: box-shadow .2s, transform .15s, border-color .2s;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-height: 110px;
 }
 .playlist-card:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,.2);
     transform: translateY(-2px);
-}
-
-.card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
+    border-color: var(--accent);
 }
 
 .card-name {
     font-size: .92em;
     font-weight: 600;
-    flex: 1;
     word-break: break-word;
     line-height: 1.4;
 }
@@ -409,31 +403,27 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     word-break: break-word;
 }
 
-.card-dates {
-    font-size: .70em;
-    color: var(--text-muted);
-    margin: 4px 0 6px;
-    opacity: .75;
-}
-
 .card-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 4px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
 }
 
 .card-owner {
-    font-size: .74em;
+    font-size: .72em;
     color: var(--text-muted);
 }
 
-.card-arrow {
-    font-size: .9em;
+.card-updated {
+    font-size: .70em;
     color: var(--text-muted);
-    transition: transform .2s;
+    opacity: .7;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
 }
-.playlist-card:hover .card-arrow { transform: translateX(4px); }
 
 /* ── Mini-lecteur ─────────────────────────────────────────────── */
 
