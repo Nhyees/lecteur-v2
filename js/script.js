@@ -605,6 +605,21 @@
         const toggleHistoryBtn = document.getElementById("toggle-history");
         const historyBox       = document.getElementById("history-box");
 
+        const playPauseBtn = document.getElementById("playPauseButton");
+        if (playPauseBtn) {
+            const syncIcon = () => {
+                const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
+                playPauseBtn.textContent = (active && !active.paused) ? "⏸" : "▶";
+            };
+            playPauseBtn.addEventListener("click", () => {
+                const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
+                if (!active) return;
+                active.paused ? active.play() : active.pause();
+            });
+            if (videoPlayer) { videoPlayer.addEventListener("play", syncIcon); videoPlayer.addEventListener("pause", syncIcon); }
+            if (audioPlayer) { audioPlayer.addEventListener("play", syncIcon); audioPlayer.addEventListener("pause", syncIcon); }
+        }
+
         if (prevBtn)   prevBtn.addEventListener("click", playPrevious);
         if (nextBtn)   nextBtn.addEventListener("click", playNext);
         if (randomBtn) randomBtn.addEventListener("click", function() {

@@ -448,6 +448,8 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
         margin-bottom: 18px;
         bottom: auto;
     }
+    .detail-dates { display: none; }
+    .detail-title-row { flex-direction: column; gap: 4px; }
 }
 
 .player-now-playing {

@@ -14,13 +14,14 @@
         <div class="login-card">
             <div class="login-icon">🎵</div>
             <h1>Playlists Communautaires</h1>
-            <p class="login-sub">Entre ton pseudo pour accéder</p>
+            <p class="login-sub">Entre ton pseudo et le mot de passe</p>
             <div class="login-form">
                 <input type="text" id="pseudo-input" class="input-field"
                        placeholder="Ton pseudo" maxlength="30" autocomplete="off">
+                <input type="password" id="password-input" class="input-field"
+                       placeholder="Mot de passe" autocomplete="off">
                 <button id="login-btn" class="btn-primary">Entrer</button>
             </div>
-            <p class="login-note">Aucun mot de passe · Sauvegardé localement</p>
             <button id="skip-login-btn" class="btn-ghost login-skip">Continuer sans se connecter</button>
             <a href="index.html" class="login-back">⬅ Retour à l'accueil</a>
         </div>
@@ -35,7 +36,7 @@
                 <span class="header-title">🌸</span>
             </div>
             <div class="header-right">
-                <button id="login-header-btn" class="btn-primary sm" style="display:none">Se connecter</button>
+                <button id="login-header-btn" class="btn-primary sm" style="display:none">👤</button>
                 <span id="user-chip" class="user-chip" style="display:none">👤 <span id="user-pseudo"></span></span>
                 <button id="new-playlist-btn" class="btn-primary sm" style="display:none">+ Playlist</button>
                 <button id="theme-btn" class="btn-icon" aria-label="Changer de thème">🫧</button>
@@ -256,10 +257,18 @@
         }
 
         // ── Connexion ─────────────────────────────────────────────────────────
-        async function login(pseudo) {
+        async function login(pseudo, password) {
             pseudo = pseudo.trim();
             if (!pseudo)            return showToast('Entre un pseudo', 'error');
             if (pseudo.length > 30) return showToast('Pseudo trop long (max 30 car.)', 'error');
+            if (!password)          return showToast('Entre le mot de passe', 'error');
+
+            const { data: cfg } = await db
+                .from('config')
+                .select('value')
+                .eq('key', 'password')
+                .single();
+            if (!cfg || cfg.value !== password) return showToast('Mot de passe incorrect', 'error');
 
             const { data: existing } = await db
                 .from('users')
@@ -284,6 +293,7 @@
             localStorage.setItem(USER_KEY, JSON.stringify(user));
             loginOverlay.style.display = 'none';
             pseudoInput.value = '';
+            $('password-input').value = '';
             updateHeader();
             renderPlaylists();
             if (!user.approved) showToast('Connecté en lecture seule - accès non validé', 'info');
@@ -383,6 +393,8 @@
         // ── Détail playlist ───────────────────────────────────────────────────
         async function openPlaylist(pl) {
             state.currentPlaylist = pl;
+            state.songs = [];
+            songList.innerHTML = '';
             detailName.textContent  = pl.nom;
             detailDesc.textContent  = pl.description || '';
             detailOwner.textContent = `By ${pl.users?.pseudo || '?'}`;
@@ -392,6 +404,10 @@
             deletePlaylistBtn.style.display = isOwner ? 'inline-flex' : 'none';
             $('edit-desc-btn').style.display = isOwner ? 'inline-flex' : 'none';
             $('add-song-card').style.display = isOwner ? 'block' : 'none';
+
+            document.querySelectorAll('.sort-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.sort === sortMode);
+            });
 
             viewDashboard.style.display = 'none';
             viewPlaylist.style.display  = 'block';
@@ -439,7 +455,7 @@
                     <div class="song-meta">
                         <div class="song-title-row">
                             <span class="song-title">${esc(song.titre)}</span>
-                            ${artist ? `<span class="song-by">${esc(artist)}</span>` : ''}
+                            ${artist ? `<span class="song-by">by ${esc(artist)}</span>` : ''}
                         </div>
                         <span class="song-by">${esc(subtitle)}</span>
                     </div>
@@ -580,7 +596,18 @@
         function openInPlayer() {
             if (!state.songs.length) return showToast('Playlist vide', 'error');
             stopPlayer();
-            const amqSongs = state.songs.map(songToAMQ);
+            const sortedSongs = [...state.songs].sort((a, b) => {
+                if (sortMode === 'title') {
+                    return a.titre.localeCompare(b.titre, 'fr', { sensitivity: 'base' });
+                }
+                if (sortMode === 'anime') {
+                    const animeA = a.song_data?.animeJPName || '';
+                    const animeB = b.song_data?.animeJPName || '';
+                    return animeA.localeCompare(animeB, 'fr', { sensitivity: 'base' }) || a.titre.localeCompare(b.titre, 'fr', { sensitivity: 'base' });
+                }
+                return 0;
+            });
+            const amqSongs = sortedSongs.map(songToAMQ);
             const plName   = state.currentPlaylist.nom;
             let playlists  = {};
             try { playlists = JSON.parse(localStorage.getItem('playlists') || '{}'); } catch {}
@@ -678,8 +705,9 @@
         }
 
         // ── Événements ────────────────────────────────────────────────────────
-        $('login-btn').addEventListener('click', () => login(pseudoInput.value));
-        pseudoInput.addEventListener('keydown', e => e.key === 'Enter' && login(pseudoInput.value));
+        $('login-btn').addEventListener('click', () => login(pseudoInput.value, $('password-input').value));
+        pseudoInput.addEventListener('keydown', e => e.key === 'Enter' && $('password-input').focus());
+        $('password-input').addEventListener('keydown', e => e.key === 'Enter' && login(pseudoInput.value, $('password-input').value));
 
         $('logout-btn').addEventListener('click', logout);
         $('theme-btn').addEventListener('click', () => applyTheme(themeIdx + 1));
