@@ -21,6 +21,7 @@
                 <button id="login-btn" class="btn-primary">Entrer</button>
             </div>
             <p class="login-note">Aucun mot de passe · Sauvegardé localement</p>
+            <button id="skip-login-btn" class="btn-ghost login-skip">Continuer sans se connecter</button>
             <a href="index.html" class="login-back">⬅ Retour à l'accueil</a>
         </div>
     </div>
@@ -30,14 +31,15 @@
 
         <header class="header">
             <div class="header-left">
-                <a href="index.html" class="btn-ghost">⬅</a>
-                <span class="header-title">🎵 Playlists communautaires</span>
+                <a href="#" onclick="history.length > 1 ? history.back() : location.href='index.html'; return false;" class="btn-ghost">⬅</a>
+                <span class="header-title">🌸</span>
             </div>
             <div class="header-right">
-                <span class="user-chip">👤 <span id="user-pseudo"></span></span>
-                <button id="new-playlist-btn" class="btn-primary sm">+ Playlist</button>
+                <button id="login-header-btn" class="btn-primary sm" style="display:none">Se connecter</button>
+                <span id="user-chip" class="user-chip" style="display:none">👤 <span id="user-pseudo"></span></span>
+                <button id="new-playlist-btn" class="btn-primary sm" style="display:none">+ Playlist</button>
                 <button id="theme-btn" class="btn-icon" aria-label="Changer de thème">🫧</button>
-                <button id="logout-btn" class="btn-ghost">Déconnexion</button>
+                <button id="logout-btn" class="btn-ghost" style="display:none">Déconnexion</button>
             </div>
         </header>
 
@@ -58,43 +60,59 @@
             <div class="view-header">
                 <button id="back-btn" class="btn-ghost">⬅ Retour</button>
                 <div class="playlist-heading">
-                    <h2 id="detail-name"></h2>
+                    <div class="detail-title-row">
+                        <h2 id="detail-name"></h2>
+                        <span id="detail-dates" class="detail-dates"></span>
+                    </div>
                     <p id="detail-desc" class="text-muted"></p>
-                    <span id="detail-owner" class="owner-chip"></span>
                 </div>
-                <div id="playlist-action-group" class="header-action-group" style="display:none">
-                    <button id="open-in-player-btn" class="btn-ghost">▶ Lecteur</button>
-                    <button id="export-json-btn"    class="btn-ghost">⬇ .json</button>
-                    <button id="delete-playlist-btn" class="btn-danger" style="display:none">🗑️ Supprimer</button>
+                <div class="detail-right">
+                    <span id="detail-owner" class="owner-chip"></span>
+                    <div id="playlist-action-group" class="header-action-group" style="display:none">
+                        <button id="open-in-player-btn" class="btn-ghost">▶ Lecteur</button>
+                        <button id="export-json-btn"    class="btn-ghost">⬇ .json</button>
+                        <button id="edit-desc-btn"      class="btn-ghost" style="display:none">Modifier</button>
+                        <button id="delete-playlist-btn" class="btn-danger" style="display:none">🗑️ Supprimer</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Mini-lecteur -->
             <div id="player-area" class="mini-player" style="display:none">
                 <p class="player-now-playing">En cours de lecture</p>
-                <span id="player-title" class="player-title"></span>
+                <span id="player-title" class="player-title"></span><span id="player-artist" class="player-artist"></span>
+                <span id="player-subtitle" class="song-by"></span>
                 <video id="player-video" controls style="display:none"></video>
                 <audio id="player-audio" controls style="display:none"></audio>
             </div>
 
-            <!-- Ajout de chanson -->
-            <div class="add-song-card">
-                <h3>Ajouter une chanson</h3>
-                <div class="import-json-row">
-                    <label class="import-json-label" for="json-file-input">📂 Importer un .json AMQ</label>
+            <div id="add-song-card" class="add-song-card">
+                <div class="add-song-header">
+                    <label class="import-json-label" for="json-file-input">Importer un .json</label>
                     <input type="file" id="json-file-input" accept=".json" style="display:none">
-                    <span class="import-sep">— ou manuellement ↓</span>
+                    <button id="toggle-add-song" class="add-song-toggle">
+                        <span>Ajouter une musique</span>
+                        <span class="toggle-chevron">▼</span>
+                    </button>
                 </div>
-                <div class="add-song-row add-song-meta">
-                    <input type="text" id="song-title-input"  class="input-field" placeholder="Titre">
-                    <input type="text" id="song-artist-input" class="input-field" placeholder="Artiste (optionnel)">
-                    <input type="text" id="song-anime-input"  class="input-field" placeholder="Anime (optionnel)">
-                    <input type="text" id="song-type-input"   class="input-field" placeholder="Type (ex: Opening 1)">
+                <div id="add-song-body" class="add-song-body">
+                    <div class="add-song-row add-song-meta">
+                        <input type="text" id="song-title-input"  class="input-field" placeholder="Titre">
+                        <input type="text" id="song-artist-input" class="input-field" placeholder="Artiste (optionnel)">
+                        <input type="text" id="song-anime-input"  class="input-field" placeholder="Anime (optionnel)">
+                        <input type="text" id="song-type-input"   class="input-field" placeholder="Type (ex: Opening 1)">
+                    </div>
+                    <div class="add-song-row">
+                        <input type="url"  id="song-url-input"    class="input-field" placeholder="URL AMQ (https://naedist…) *">
+                        <button id="add-song-btn" class="btn-primary">Ajouter</button>
+                    </div>
                 </div>
-                <div class="add-song-row">
-                    <input type="url"  id="song-url-input"    class="input-field" placeholder="URL AMQ (https://naedist…) *">
-                    <button id="add-song-btn" class="btn-primary">Ajouter</button>
-                </div>
+            </div>
+
+            <div class="sort-bar">
+                <span class="sort-label">Trier par</span>
+                <button class="sort-btn active" data-sort="anime">Anime > Titre</button>
+                <button class="sort-btn" data-sort="title">Titre</button>
+                <button class="sort-btn" data-sort="default">Update</button>
             </div>
 
             <div id="song-list" class="song-list"></div>
@@ -124,6 +142,24 @@
             <div class="modal-actions">
                 <button id="cancel-create-btn" class="btn-ghost">Annuler</button>
                 <button id="confirm-create-btn" class="btn-primary">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Modal : modifier la description ──────────────────────── -->
+    <div id="modal-edit" class="modal-overlay" style="display:none">
+        <div class="modal-card">
+            <h2>Modifier la description</h2>
+            <div class="form-group">
+                <label for="edit-desc">
+                    Description <span class="optional">(optionnel)</span>
+                </label>
+                <textarea id="edit-desc" class="input-field" rows="3"
+                          placeholder="Une courte description…" maxlength="200"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-edit-btn" class="btn-ghost">Annuler</button>
+                <button id="confirm-edit-btn" class="btn-primary">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -175,12 +211,15 @@
             localStorage.setItem(THEME_KEY, themeIdx);
         }
 
+        let sortMode = 'anime';
+
         // ── État ──────────────────────────────────────────────────────────────
         const state = {
             user:            null,
             playlists:       [],
             currentPlaylist: null,
-            songs:           []
+            songs:           [],
+            currentSongIdx:  -1
         };
 
         // ── Refs DOM ──────────────────────────────────────────────────────────
@@ -219,12 +258,12 @@
         // ── Connexion ─────────────────────────────────────────────────────────
         async function login(pseudo) {
             pseudo = pseudo.trim();
-            if (!pseudo)         return showToast('Entre un pseudo', 'error');
+            if (!pseudo)            return showToast('Entre un pseudo', 'error');
             if (pseudo.length > 30) return showToast('Pseudo trop long (max 30 car.)', 'error');
 
             const { data: existing } = await db
                 .from('users')
-                .select('id, pseudo')
+                .select('id, pseudo, approved')
                 .eq('pseudo', pseudo)
                 .maybeSingle();
 
@@ -235,7 +274,7 @@
                 const { data, error } = await db
                     .from('users')
                     .insert({ pseudo })
-                    .select('id, pseudo')
+                    .select('id, pseudo, approved')
                     .single();
                 if (error) return showToast('Erreur lors de la connexion', 'error');
                 user = data;
@@ -243,29 +282,43 @@
 
             state.user = user;
             localStorage.setItem(USER_KEY, JSON.stringify(user));
-            startApp();
+            loginOverlay.style.display = 'none';
+            pseudoInput.value = '';
+            updateHeader();
+            renderPlaylists();
+            if (!user.approved) showToast('Connecté en lecture seule - accès non validé', 'info');
         }
 
         function logout() {
             localStorage.removeItem(USER_KEY);
             state.user = null;
-            app.style.display = 'none';
-            loginOverlay.style.display = 'flex';
             pseudoInput.value = '';
+            updateHeader();
+            renderPlaylists();
         }
 
         function startApp() {
             loginOverlay.style.display = 'none';
             app.style.display = 'flex';
-            $('user-pseudo').textContent = state.user.pseudo;
+            updateHeader();
             loadPlaylists();
+        }
+
+        function updateHeader() {
+            const loggedIn  = !!state.user;
+            const approved  = !!state.user?.approved;
+            $('login-header-btn').style.display  = loggedIn ? 'none' : 'inline-flex';
+            $('user-chip').style.display         = loggedIn ? 'inline-flex' : 'none';
+            $('user-pseudo').textContent         = loggedIn ? state.user.pseudo : '';
+            $('new-playlist-btn').style.display  = approved ? 'inline-flex' : 'none';
+            $('logout-btn').style.display        = loggedIn ? 'inline-flex' : 'none';
         }
 
         // ── Playlists ─────────────────────────────────────────────────────────
         async function loadPlaylists() {
             const { data, error } = await db
                 .from('playlists')
-                .select('id, nom, description, user_id, users(pseudo)')
+                .select('id, nom, description, user_id, created_at, updated_at, users(pseudo)')
                 .order('id', { ascending: false });
             if (error) return showToast('Erreur de chargement', 'error');
             state.playlists = data || [];
@@ -285,22 +338,14 @@
                 card.innerHTML = `
                     <div class="card-top">
                         <h3 class="card-name">${esc(pl.nom)}</h3>
-                        ${isOwner
-                            ? `<button class="card-del-btn" title="Supprimer cette playlist">🗑️</button>`
-                            : ''}
                     </div>
-                    <p class="card-desc">${pl.description
-                        ? esc(pl.description)
-                        : '<em>Pas de description</em>'}</p>
+                    <p class="card-desc">${pl.description ? esc(pl.description) : ''}</p>
+                    <div class="card-dates">updated ${pl.updated_at ? formatDate(pl.updated_at) : formatDate(pl.created_at)}</div>
                     <div class="card-foot">
                         <span class="card-owner">👤 ${esc(pl.users?.pseudo || '?')}</span>
                         <span class="card-arrow">→</span>
                     </div>
                 `;
-                card.querySelector('.card-del-btn')?.addEventListener('click', e => {
-                    e.stopPropagation();
-                    deletePlaylist(pl.id, null);
-                });
                 card.addEventListener('click', () => openPlaylist(pl));
                 playlistGrid.appendChild(card);
             });
@@ -313,8 +358,8 @@
 
             const { data, error } = await db
                 .from('playlists')
-                .insert({ nom, description: desc || null, user_id: state.user.id })
-                .select('id, nom, description, user_id, users(pseudo)')
+                .insert({ nom, description: desc || null, user_id: state.user.id, updated_at: new Date().toISOString() })
+                .select('id, nom, description, user_id, created_at, updated_at, users(pseudo)')
                 .single();
             if (error) return showToast('Erreur lors de la création', 'error');
 
@@ -340,10 +385,13 @@
             state.currentPlaylist = pl;
             detailName.textContent  = pl.nom;
             detailDesc.textContent  = pl.description || '';
-            detailOwner.textContent = `👤 ${pl.users?.pseudo || '?'}`;
+            detailOwner.textContent = `By ${pl.users?.pseudo || '?'}`;
+            $('detail-dates').textContent = `created ${formatDate(pl.created_at)}${pl.updated_at ? ` ~ last updated ${formatDate(pl.updated_at)}` : ''}`;
             playlistActionGroup.style.display = 'flex';
-            deletePlaylistBtn.style.display =
-                state.user?.id === pl.user_id ? 'inline-flex' : 'none';
+            const isOwner = state.user?.approved && state.user?.id === pl.user_id;
+            deletePlaylistBtn.style.display = isOwner ? 'inline-flex' : 'none';
+            $('edit-desc-btn').style.display = isOwner ? 'inline-flex' : 'none';
+            $('add-song-card').style.display = isOwner ? 'block' : 'none';
 
             viewDashboard.style.display = 'none';
             viewPlaylist.style.display  = 'block';
@@ -364,10 +412,23 @@
         function renderSongs() {
             songList.innerHTML = '';
             emptyPlaylist.style.display = state.songs.length === 0 ? 'block' : 'none';
-            const isOwner = state.user?.id === state.currentPlaylist?.user_id;
+            const isOwner = state.user?.approved && state.user?.id === state.currentPlaylist?.user_id;
 
-            state.songs.forEach((song, i) => {
+            const songs = [...state.songs].sort((a, b) => {
+                if (sortMode === 'title') {
+                    return a.titre.localeCompare(b.titre, 'fr', { sensitivity: 'base' });
+                }
+                if (sortMode === 'anime') {
+                    const animeA = a.song_data?.animeJPName || '';
+                    const animeB = b.song_data?.animeJPName || '';
+                    return animeA.localeCompare(animeB, 'fr', { sensitivity: 'base' }) || a.titre.localeCompare(b.titre, 'fr', { sensitivity: 'base' });
+                }
+                return 0;
+            });
+
+            songs.forEach((song, i) => {
                 const sd = song.song_data;
+                const artist  = sd?.songArtist || '';
                 const subtitle = sd
                     ? [sd.animeJPName, sd.songType].filter(Boolean).join(' · ') || `ajouté par ${esc(song.users?.pseudo || '?')}`
                     : `ajouté par ${esc(song.users?.pseudo || '?')}`;
@@ -376,7 +437,10 @@
                 item.innerHTML = `
                     <span class="song-num">${i + 1}</span>
                     <div class="song-meta">
-                        <span class="song-title">${esc(song.titre)}</span>
+                        <div class="song-title-row">
+                            <span class="song-title">${esc(song.titre)}</span>
+                            ${artist ? `<span class="song-by">${esc(artist)}</span>` : ''}
+                        </div>
                         <span class="song-by">${esc(subtitle)}</span>
                     </div>
                     <div class="song-btns">
@@ -387,7 +451,7 @@
                     </div>
                 `;
                 item.querySelector('.btn-play').addEventListener('click', () =>
-                    playSong(song.url, song.titre, item));
+                    playSong(song.url, song.titre, song.song_data, item));
                 item.querySelector('.song-del')?.addEventListener('click', () =>
                     deleteSong(song.id));
                 songList.appendChild(item);
@@ -436,7 +500,8 @@
         }
 
         // ── Mini-lecteur ──────────────────────────────────────────────────────
-        function playSong(url, titre, itemEl) {
+        function playSong(url, titre, sd, itemEl) {
+            state.currentSongIdx = state.songs.findIndex(s => s.url === url);
             const fullUrl = url.startsWith('http')
                 ? url
                 : 'https://eudist.animemusicquiz.com/' + url;
@@ -446,7 +511,11 @@
                 .forEach(el => el.classList.remove('playing'));
             itemEl.classList.add('playing');
 
-            playerTitle.textContent  = titre;
+            playerTitle.textContent = titre;
+            const artist   = sd?.songArtist || '';
+            const subParts = sd ? [sd.animeJPName, sd.songType].filter(Boolean).join(' · ') : '';
+            $('player-artist').textContent   = artist;
+            $('player-subtitle').textContent = subParts ? (artist ? '· ' + subParts : subParts) : '';
             playerArea.style.display = 'block';
 
             if (isVideo) {
@@ -518,7 +587,21 @@
             playlists[plName] = amqSongs;
             localStorage.setItem('playlists', JSON.stringify(playlists));
             localStorage.setItem('activePlaylist', plName);
-            window.open('playlist.html', '_blank');
+
+            // Sync thème
+            const themeMap = ['css/style.css', 'css/style_girly.css', 'css/style_orange.css'];
+            localStorage.setItem('selectedTheme', themeMap[themeIdx] || 'css/style.css');
+
+            // Sync volume
+            const vol = playerVideo.volume ?? playerAudio.volume ?? 0.3;
+            localStorage.setItem('savedVolume', vol);
+
+            // Sync musique en cours
+            if (state.currentSongIdx >= 0)
+                localStorage.setItem('activeSongIndex', state.currentSongIdx);
+
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            window.open(isMobile ? 'playlist_mobile.html' : 'playlist.html', '_blank');
         }
 
         function exportJSON() {
@@ -542,6 +625,47 @@
 
         function closeCreateModal() {
             modalCreate.style.display = 'none';
+        }
+
+        // ── Édition de description ────────────────────────────────────────────
+        function openEditModal(pl) {
+            $('edit-desc').value = pl.description || '';
+            $('modal-edit').dataset.playlistId = pl.id;
+            $('modal-edit').style.display = 'flex';
+            setTimeout(() => $('edit-desc').focus(), 50);
+        }
+
+        function closeEditModal() {
+            $('modal-edit').style.display = 'none';
+        }
+
+        async function updateDescription(id, newDesc) {
+            const now = new Date().toISOString();
+            const { error } = await db
+                .from('playlists')
+                .update({ description: newDesc || null, updated_at: now })
+                .eq('id', id);
+            if (error) { console.error(error); return showToast('Erreur lors de la mise à jour', 'error'); }
+            const idx = state.playlists.findIndex(p => p.id === id);
+            if (idx !== -1) {
+                state.playlists[idx].description = newDesc || null;
+                state.playlists[idx].updated_at = now;
+            }
+            if (state.currentPlaylist?.id === id) {
+                state.currentPlaylist.description = newDesc || null;
+                state.currentPlaylist.updated_at = now;
+                detailDesc.textContent = newDesc || '';
+                $('detail-dates').textContent = `created ${formatDate(state.currentPlaylist.created_at)} ~ last updated ${formatDate(now)}`;
+            }
+            renderPlaylists();
+            closeEditModal();
+            showToast('Description mise à jour !', 'success');
+        }
+
+        // ── Formatage de date ─────────────────────────────────────────────────
+        function formatDate(iso) {
+            if (!iso) return '-';
+            return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
         // ── Échappement HTML ──────────────────────────────────────────────────
@@ -568,6 +692,8 @@
             viewDashboard.style.display = 'block';
         });
 
+        $('edit-desc-btn').addEventListener('click', () => openEditModal(state.currentPlaylist));
+
         deletePlaylistBtn.addEventListener('click', () =>
             deletePlaylist(state.currentPlaylist.id, () => {
                 stopPlayer();
@@ -576,6 +702,11 @@
                 viewDashboard.style.display = 'block';
             })
         );
+
+        $('toggle-add-song').addEventListener('click', () => {
+            $('toggle-add-song').classList.toggle('open');
+            $('add-song-body').classList.toggle('open');
+        });
 
         $('add-song-btn').addEventListener('click', addSong);
         $('song-url-input').addEventListener('keydown', e => e.key === 'Enter' && addSong());
@@ -587,23 +718,41 @@
             if (file) { addSongsFromJSON(file); e.target.value = ''; }
         });
 
+        $('login-header-btn').addEventListener('click', () => {
+            loginOverlay.style.display = 'flex';
+            setTimeout(() => pseudoInput.focus(), 50);
+        });
+        $('skip-login-btn').addEventListener('click', () => {
+            loginOverlay.style.display = 'none';
+        });
+
         $('cancel-create-btn').addEventListener('click', closeCreateModal);
         $('confirm-create-btn').addEventListener('click', createPlaylist);
         $('create-name').addEventListener('keydown', e => e.key === 'Enter' && createPlaylist());
         modalCreate.addEventListener('click', e => e.target === modalCreate && closeCreateModal());
 
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                sortMode = btn.dataset.sort;
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderSongs();
+            });
+        });
+
+        $('cancel-edit-btn').addEventListener('click', closeEditModal);
+        $('confirm-edit-btn').addEventListener('click', () => {
+            const id = $('modal-edit').dataset.playlistId;
+            updateDescription(id, $('edit-desc').value.trim());
+        });
+        $('modal-edit').addEventListener('click', e => e.target === $('modal-edit') && closeEditModal());
+
         // ── Init ──────────────────────────────────────────────────────────────
         const savedUser = localStorage.getItem(USER_KEY);
         if (savedUser) {
-            try {
-                state.user = JSON.parse(savedUser);
-                startApp();
-            } catch {
-                loginOverlay.style.display = 'flex';
-            }
-        } else {
-            loginOverlay.style.display = 'flex';
+            try { state.user = JSON.parse(savedUser); } catch { localStorage.removeItem(USER_KEY); }
         }
+        startApp();
 
     })();
     </script>

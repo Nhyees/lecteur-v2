@@ -189,6 +189,13 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     margin-bottom: 16px;
 }
 
+.login-skip {
+    font-size: .8em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    width: 100%;
+}
+
 .login-back {
     font-size: .8em;
     color: var(--text-muted);
@@ -271,13 +278,35 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
 }
 
 .owner-chip {
-    display: inline-block;
     font-size: .78em;
     color: var(--text-muted);
-    margin-top: 6px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.detail-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    align-self: flex-start;
+    flex-shrink: 0;
 }
 
 .text-muted { color: var(--text-muted); font-size: .86em; margin-top: 3px; }
+
+.detail-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.detail-dates {
+    font-size: .72em;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
 
 /* ── Grille playlists ─────────────────────────────────────────── */
 .playlist-grid {
@@ -332,12 +361,38 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
 }
 .card-del-btn:hover { opacity: 1; }
 
+.card-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.card-edit-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: .85em;
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: .4;
+    transition: opacity .2s;
+    line-height: 1;
+}
+.card-edit-btn:hover { opacity: 1; }
+
 .card-desc {
     font-size: .78em;
     color: var(--text-muted);
     flex: 1;
     line-height: 1.5;
     word-break: break-word;
+}
+
+.card-dates {
+    font-size: .70em;
+    color: var(--text-muted);
+    margin: 4px 0 6px;
+    opacity: .75;
 }
 
 .card-foot {
@@ -360,12 +415,39 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
 .playlist-card:hover .card-arrow { transform: translateX(4px); }
 
 /* ── Mini-lecteur ─────────────────────────────────────────────── */
+
 .mini-player {
+    position: fixed;
+    right: 24px;
+    top: 320px;
+    width: 256px;
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 14px 18px;
-    margin-bottom: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.18);
+    z-index: 50;
+}
+
+/* Écran moyen : coin bas-droite pour ne pas chevaucher la liste */
+@media (max-width: 1400px) {
+    .mini-player {
+        top: auto;
+        bottom: 24px;
+        right: 24px;
+        width: 240px;
+    }
+}
+
+/* Mobile : inline, pleine largeur */
+@media (max-width: 768px) {
+    .mini-player {
+        position: static;
+        width: auto;
+        box-shadow: none;
+        margin-bottom: 18px;
+        bottom: auto;
+    }
 }
 
 .player-now-playing {
@@ -377,13 +459,18 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
 }
 
 .player-title {
-    display: block;
     font-size: .9em;
     font-weight: 600;
-    margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.player-artist {
+    font-size: .72em;
+    color: var(--text-muted);
+    margin-left: 8px;
+    margin-bottom: 10px;
 }
 
 .mini-player video,
@@ -403,13 +490,41 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     margin-bottom: 18px;
 }
 
-.add-song-card h3 {
+.add-song-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.add-song-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    cursor: pointer;
     font-size: .76em;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .5px;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    padding: 0;
+}
+.toggle-chevron {
+    font-size: .7em;
+    transition: transform .3s ease;
+}
+.add-song-toggle.open .toggle-chevron { transform: rotate(180deg); }
+
+.add-song-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s ease;
+}
+.add-song-body.open {
+    max-height: 300px;
+    margin-top: 12px;
 }
 
 .add-song-row {
@@ -422,6 +537,35 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
 
 .add-song-meta .input-field { flex: 1 1 140px; }
 .add-song-row:not(.add-song-meta) .input-field { flex: 1 1 260px; }
+
+/* ── Tri ──────────────────────────────────────────────────────── */
+.sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.sort-label {
+    font-size: .72em;
+    color: var(--text-muted);
+    margin-right: 2px;
+}
+
+.sort-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: .74em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: .2s;
+}
+.sort-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.sort-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 
 /* ── Liste chansons ───────────────────────────────────────────── */
 .song-list { display: flex; flex-direction: column; gap: 5px; }
@@ -451,6 +595,13 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+}
+
+.song-title-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
     min-width: 0;
 }
 

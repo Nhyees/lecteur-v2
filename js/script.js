@@ -590,7 +590,12 @@
         }
 
         loadPlaylists();
-        if (state.musicData.length > 0) prepareMusic(0);
+        if (state.musicData.length > 0) {
+            const savedIdx = parseInt(localStorage.getItem('activeSongIndex'));
+            const startIdx = (!isNaN(savedIdx) && savedIdx >= 0 && savedIdx < state.musicData.length) ? savedIdx : 0;
+            localStorage.removeItem('activeSongIndex');
+            prepareMusic(startIdx);
+        }
 
         const prevBtn   = document.getElementById("prevButton");
         const nextBtn   = document.getElementById("nextButton");

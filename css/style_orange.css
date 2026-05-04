@@ -254,10 +254,10 @@ video {
     left: 10px;
     background-color: #5d483a;
     color: white;
-    padding: 8px 12px;
+    padding: 10px 15px;
     text-decoration: none;
-    border-radius: 5px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 18px;
     font-weight: bold;
     transition: 0.3s;
 }
