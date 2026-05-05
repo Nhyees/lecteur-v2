@@ -104,12 +104,12 @@
                 <div id="add-song-body" class="add-song-body">
                     <div class="add-song-row add-song-meta">
                         <input type="text" id="song-title-input"  class="input-field" placeholder="Titre">
-                        <input type="text" id="song-artist-input" class="input-field" placeholder="Artiste (optionnel)">
-                        <input type="text" id="song-anime-input"  class="input-field" placeholder="Anime (optionnel)">
-                        <input type="text" id="song-type-input"   class="input-field" placeholder="Type (ex: Opening 1)">
+                        <input type="text" id="song-artist-input" class="input-field" placeholder="Artiste">
+                        <input type="text" id="song-anime-input"  class="input-field" placeholder="Anime">
+                        <input type="text" id="song-type-input"   class="input-field" placeholder="Type">
                     </div>
                     <div class="add-song-row">
-                        <input type="url"  id="song-url-input"    class="input-field" placeholder="URL AMQ (https://naedist…) *">
+                        <input type="url"  id="song-url-input"    class="input-field" placeholder="URL">
                         <button id="add-song-btn" class="btn-primary">Ajouter</button>
                     </div>
                 </div>
@@ -117,14 +117,14 @@
 
             <div class="sort-bar">
                 <span class="sort-label">Trier par</span>
-                <button class="sort-btn active" data-sort="anime">Anime > Titre</button>
+                <button class="sort-btn active" data-sort="anime">Anime</button>
                 <button class="sort-btn" data-sort="title">Titre</button>
-                <button class="sort-btn" data-sort="default">Update</button>
+                <button class="sort-btn" data-sort="default">Date</button>
             </div>
 
             <div id="song-list" class="song-list"></div>
             <p id="empty-playlist" class="empty-msg" style="display:none">
-                Aucune chanson.
+                Aucune musique.
             </p>
         </div>
 
