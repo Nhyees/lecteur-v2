@@ -35,7 +35,8 @@
         lastPlayedHistory: [],
         playlists: {},
         activePlaylist: "",
-        searchQuery: ""
+        searchQuery: "",
+        sortMode: "default"
     };
 
     // -- Elements DOM --------------------------------------------------------
@@ -375,6 +376,24 @@
         const heading = document.createElement("h2");
         heading.textContent = `Liste des chansons (${state.musicData.length})`;
 
+        const sortBar = document.createElement("div");
+        sortBar.className = "sort-bar";
+        [["default", "Par défaut"], ["title", "Titre"], ["anime", "Anime"]].forEach(([mode, label]) => {
+            const btn = document.createElement("button");
+            btn.className = "sort-btn" + (state.sortMode === mode ? " active" : "");
+            btn.textContent = label;
+            btn.addEventListener("click", () => {
+                state.sortMode = mode;
+                renderMusicList();
+            });
+            sortBar.appendChild(btn);
+        });
+
+        const headingRow = document.createElement("div");
+        headingRow.className = "heading-row";
+        headingRow.appendChild(heading);
+        headingRow.appendChild(sortBar);
+
         const searchInput = document.createElement("input");
         searchInput.type = "search";
         searchInput.className = "search-input";
@@ -386,7 +405,7 @@
             filterMusicItems();
         });
 
-        list.replaceChildren(manager, importRow, heading, searchInput);
+        list.replaceChildren(manager, importRow, headingRow, searchInput);
 
         if (state.musicData.length === 0) {
             const msg = document.createElement("p");
@@ -396,7 +415,18 @@
             return;
         }
 
-        state.musicData.forEach((music, index) => {
+        const sortedIndices = state.musicData.map((_, i) => i).sort((a, b) => {
+            const ma = state.musicData[a], mb = state.musicData[b];
+            if (state.sortMode === "title")
+                return (ma.songName || "").localeCompare(mb.songName || "", "fr", { sensitivity: "base" });
+            if (state.sortMode === "anime")
+                return (ma.animeJPName || "").localeCompare(mb.animeJPName || "", "fr", { sensitivity: "base" })
+                    || (ma.songName || "").localeCompare(mb.songName || "", "fr", { sensitivity: "base" });
+            return 0;
+        });
+
+        sortedIndices.forEach(index => {
+            const music = state.musicData[index];
             const musicItem = document.createElement("div");
             musicItem.classList.add("music-item");
             musicItem.draggable = true;

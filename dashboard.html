@@ -32,7 +32,7 @@
 
         <header class="header">
             <div class="header-left">
-                <a href="playlist.html" class="btn-ghost">⬅</a>
+                <button id="back-home-btn" class="btn-ghost">⬅</button>
                 <span class="header-title"></span>
             </div>
             <div class="header-right">
@@ -570,6 +570,7 @@
             $('player-artist').textContent   = artist;
             $('player-subtitle').textContent = subParts ? (artist ? '· ' + subParts : subParts) : '';
             playerArea.style.display = 'block';
+            viewPlaylist.classList.add('player-open');
 
             if (isVideo) {
                 playerAudio.pause();
@@ -599,6 +600,7 @@
             playerVideo.src          = '';
             playerAudio.src          = '';
             playerArea.style.display = 'none';
+            viewPlaylist.classList.remove('player-open');
             document.querySelectorAll('.song-item.playing')
                 .forEach(el => el.classList.remove('playing'));
         }
@@ -759,6 +761,11 @@
         $('login-btn').addEventListener('click', () => login(pseudoInput.value, $('password-input').value));
         pseudoInput.addEventListener('keydown', e => e.key === 'Enter' && $('password-input').focus());
         $('password-input').addEventListener('keydown', e => e.key === 'Enter' && login(pseudoInput.value, $('password-input').value));
+
+        $('back-home-btn').addEventListener('click', () => {
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            location.href = isMobile ? 'playlist_mobile.html' : 'playlist.html';
+        });
 
         $('logout-btn').addEventListener('click', logout);
         $('new-playlist-btn').addEventListener('click', openCreateModal);

@@ -451,6 +451,8 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     right: 24px;
     top: 320px;
     width: 256px;
+    max-height: calc(100vh - 344px);
+    overflow-y: auto;
     background: var(--bg-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -466,6 +468,21 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
         bottom: 24px;
         right: 24px;
         width: 240px;
+        max-height: calc(100vh - 100px);
+    }
+}
+
+/* Réserve de l'espace à droite quand le player est ouvert sur écrans intermédiaires */
+@media (min-width: 769px) and (max-width: 1400px) {
+    #view-playlist.player-open {
+        padding-right: 280px;
+    }
+}
+
+/* Sur grand écran, réserve aussi si le contenu peut déborder sous le player */
+@media (min-width: 1401px) and (max-width: 1680px) {
+    #view-playlist.player-open {
+        padding-right: 300px;
     }
 }
 
@@ -477,6 +494,9 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
         box-shadow: none;
         margin-bottom: 18px;
         bottom: auto;
+    }
+    #view-playlist.player-open {
+        padding-right: 28px;
     }
     .detail-dates { display: none; }
     .detail-title-row { flex-direction: column; gap: 4px; }
@@ -511,7 +531,10 @@ textarea.input-field     { resize: vertical; min-height: 72px; }
     border-radius: 8px;
     background: #000;
 }
-.mini-player video { max-height: 240px; object-fit: contain; }
+.mini-player video {
+    max-height: min(240px, calc(100vh - 400px));
+    object-fit: contain;
+}
 
 /* ── Formulaire ajout chanson ─────────────────────────────────── */
 .add-song-card {
