@@ -55,6 +55,7 @@ body {
 }
 
 #fileInput {
+    display: none;
     flex: 1;
     font-size: 0.8em;
     color: #aaa;
@@ -254,7 +255,6 @@ video, audio {
 
 .btn {
     background: hsl(300, 34%, 30%);
-    color: white;
     border: none;
     padding: 0;
     cursor: pointer;
@@ -367,6 +367,33 @@ video, audio {
 .search-input::placeholder {
     color: #666;
 }
+
+.import-row { display: none; }
+
+.heading-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 6px;
+}
+.heading-row h2 { margin: 0; }
+
+.sort-bar { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.sort-btn {
+    background: transparent;
+    border: 1px solid #3a3a3a;
+    color: #888;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.72em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: .2s;
+}
+.sort-btn:hover  { border-color: #888; color: #f0f0f0; }
+.sort-btn.active { background: hsl(300, 34%, 30%); border-color: hsl(300, 34%, 30%); color: #fff; }
 
 .toast-notification {
     position: fixed;

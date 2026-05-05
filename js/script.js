@@ -366,12 +366,24 @@
         fileInput.type = "file";
         fileInput.id = "fileInput";
         fileInput.accept = ".json";
+        fileInput.style.display = "none";
         fileInput.setAttribute("aria-label", "Importer une playlist JSON");
         fileInput.addEventListener("change", handleFileUpload);
 
-        const importRow = document.createElement("div");
-        importRow.className = "import-row";
-        importRow.appendChild(fileInput);
+        let importRow = null;
+        if (isMobile) {
+            manager.appendChild(fileInput);
+            const importLabel = document.createElement("label");
+            importLabel.htmlFor = "fileInput";
+            importLabel.className = "btn playlist-btn";
+            importLabel.textContent = "📂";
+            importLabel.setAttribute("aria-label", "Importer une playlist JSON");
+            manager.appendChild(importLabel);
+        } else {
+            importRow = document.createElement("div");
+            importRow.className = "import-row";
+            importRow.appendChild(fileInput);
+        }
 
         const heading = document.createElement("h2");
         heading.textContent = `Liste des chansons (${state.musicData.length})`;
@@ -405,7 +417,10 @@
             filterMusicItems();
         });
 
-        list.replaceChildren(manager, importRow, headingRow, searchInput);
+        const listChildren = importRow
+            ? [manager, importRow, headingRow, searchInput]
+            : [manager, headingRow, searchInput];
+        list.replaceChildren(...listChildren);
 
         if (state.musicData.length === 0) {
             const msg = document.createElement("p");
