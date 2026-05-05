@@ -419,10 +419,10 @@
             detailOwner.textContent = `By ${pl.users?.pseudo || '?'}`;
             $('detail-dates').textContent = `created ${formatDate(pl.created_at)}${pl.updated_at ? ` ~ last updated ${formatDate(pl.updated_at)}` : ''}`;
             playlistActionGroup.style.display = 'flex';
-            const isOwner = state.user?.approved && state.user?.id === pl.user_id;
-            deletePlaylistBtn.style.display = isOwner ? 'inline-flex' : 'none';
-            $('edit-desc-btn').style.display = isOwner ? 'inline-flex' : 'none';
-            $('add-song-card').style.display = isOwner ? 'block' : 'none';
+            const canEdit = !!state.user?.approved;
+            deletePlaylistBtn.style.display = canEdit ? 'inline-flex' : 'none';
+            $('edit-desc-btn').style.display = canEdit ? 'inline-flex' : 'none';
+            $('add-song-card').style.display = canEdit ? 'block' : 'none';
 
             document.querySelectorAll('.sort-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.sort === sortMode);
@@ -455,7 +455,7 @@
         function renderSongs() {
             songList.innerHTML = '';
             emptyPlaylist.style.display = state.songs.length === 0 ? 'block' : 'none';
-            const isOwner = state.user?.approved && state.user?.id === state.currentPlaylist?.user_id;
+            const canEdit = !!state.user?.approved;
 
             const songs = [...state.songs].sort((a, b) => {
                 if (sortMode === 'title') {
@@ -488,7 +488,7 @@
                     </div>
                     <div class="song-btns">
                         <button class="btn-play" title="Lire">▶</button>
-                        ${isOwner
+                        ${canEdit
                             ? `<button class="btn-icon song-del" title="Supprimer">❌</button>`
                             : ''}
                     </div>
@@ -661,12 +661,13 @@
             localStorage.setItem('activePlaylist', plName);
 
             // Sync thème
-            const themeMap = ['css/style.css', 'css/style_girly.css', 'css/style_orange.css'];
-            localStorage.setItem('selectedTheme', themeMap[themeIdx] || 'css/style.css');
+            localStorage.setItem('selectedTheme', THEME_CSS[themeIdx] || 'css/style.css');
 
-            // Sync volume
-            const vol = playerVideo.volume ?? playerAudio.volume ?? 0.3;
-            localStorage.setItem('savedVolume', vol);
+            // Sync volume (seulement si une chanson est active, sinon on garde la valeur existante)
+            if (state.currentSongIdx >= 0) {
+                const med = playerVideo.style.display !== 'none' ? playerVideo : playerAudio;
+                localStorage.setItem('savedVolume', med.volume);
+            }
 
             // Sync musique en cours
             if (state.currentSongIdx >= 0)
