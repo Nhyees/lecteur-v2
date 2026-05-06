@@ -432,6 +432,13 @@ video {
     transform: translateX(-50%) translateY(0);
 }
 
+/* Blindtest - surcharges theme defaut */
+.bt-fab { background-color: #522a6d; }
+.bt-fab:hover { background-color: #825599; }
+.bt-text-input:focus { border-color: hsl(300, 34%, 55%); }
+.bt-dd-item:hover { background: rgba(180, 80, 180, 0.2); color: #f0f0f0; }
+.bt-mode-btn.active { background: hsl(300, 40%, 33%); border-color: hsl(300, 40%, 45%); }
+
 @media (max-width: 700px) {
     body { align-items: flex-start; height: auto; min-height: 100vh; }
     .container {

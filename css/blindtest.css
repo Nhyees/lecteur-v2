@@ -1,0 +1,379 @@
+/* ================================================================
+   Blindtest UI
+   ================================================================ */
+
+/* Score bar */
+.bt-score {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.42);
+    border-radius: 12px;
+    font-size: 0.92em;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.bt-score-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+#bt-score-prog {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bt-score-stats {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.bt-s-ok   { color: #72cc72; font-weight: 600; }
+.bt-s-ko   { color: #e07070; font-weight: 600; }
+.bt-s-prog { color: #777; font-size: 0.88em; }
+
+/* Bouton pause dans le score */
+.bt-pause-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ccc;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.bt-pause-btn:hover  { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.bt-pause-btn:active { transform: scale(0.9); }
+
+/* Barre de progression en segments */
+.bt-segs {
+    display: flex;
+    gap: 3px;
+    width: 100%;
+}
+
+.bt-seg {
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    transition: background 0.35s;
+    min-width: 4px;
+}
+
+.bt-seg-empty   { background: rgba(255, 255, 255, 0.12); }
+.bt-seg-current { background: rgba(255, 255, 255, 0.42); animation: bt-pulse 1.3s ease-in-out infinite; }
+.bt-seg-ok      { background: #72cc72; }
+.bt-seg-ko      { background: #e07070; }
+
+@keyframes bt-pulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 1; }
+}
+
+/* Espacement entre video et controles BT */
+#bt-reveal-btn.btn,
+.bt-answer-btns,
+.bt-volume-row,
+.bt-text-wrap { margin-top: 10px; }
+
+/* Bouton Reveler */
+#bt-reveal-btn.btn {
+    border-radius: 10px;
+    width: fit-content;
+    height: auto;
+    padding: 12px 28px;
+    font-size: 0.95em;
+    margin: 10px auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Boutons Juste / Faux */
+.bt-answer-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 6px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.btn.bt-correct-btn,
+.btn.bt-wrong-btn {
+    border-radius: 10px;
+    width: auto;
+    height: auto;
+    padding: 12px 22px;
+    font-size: 0.9em;
+    flex: 1;
+    max-width: 140px;
+}
+
+.btn.bt-correct-btn { background: hsl(120, 38%, 28%); }
+.btn.bt-correct-btn:hover,
+.btn.bt-correct-btn:active { background: hsl(120, 38%, 20%); transform: scale(0.95); }
+
+.btn.bt-wrong-btn { background: hsl(0, 38%, 32%); }
+.btn.bt-wrong-btn:hover,
+.btn.bt-wrong-btn:active { background: hsl(0, 38%, 24%); transform: scale(0.95); }
+
+/* Slider de volume */
+.bt-volume-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 2px 4px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+
+.bt-volume-row span { font-size: 1em; flex-shrink: 0; }
+
+#bt-volume-slider {
+    flex: 1;
+    height: 4px;
+    accent-color: hsl(260, 50%, 60%);
+    cursor: pointer;
+}
+
+/* Bouton flottant (🎮 et toggle liste) */
+.bt-fab {
+    position: fixed;
+    z-index: 1001;
+    border-radius: 8px;
+    border: none;
+    padding: 10px 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+
+/* Modal overlay */
+.bt-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.bt-modal {
+    background: #1a1a2a;
+    border: 1px solid #3a3a5a;
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    min-width: 240px;
+    max-width: 320px;
+    width: 90vw;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.bt-modal h3 {
+    font-size: 1.2em;
+    margin: 0;
+    color: #f0f0f0;
+    letter-spacing: 0.5px;
+}
+
+.bt-modal label {
+    font-size: 0.85em;
+    color: #999;
+    align-self: flex-start;
+}
+
+.bt-count-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: #252535;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-family: inherit;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.bt-count-input:focus {
+    outline: none;
+    border-color: hsl(260, 40%, 55%);
+}
+
+.bt-modal-btns {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.bt-modal-btns .btn {
+    flex: 1;
+    border-radius: 10px;
+    width: auto;
+    height: auto;
+    padding: 10px 16px;
+    font-size: 0.9em;
+}
+
+.btn.bt-cancel-btn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #888;
+}
+
+.btn.bt-cancel-btn:hover,
+.btn.bt-cancel-btn:active {
+    background: rgba(255, 255, 255, 0.06);
+    color: #bbb;
+    transform: none;
+}
+
+/* Selecteur de mode (setup modal) */
+.bt-mode-row {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+}
+
+.bt-mode-btn {
+    flex: 1;
+    padding: 8px 10px;
+    background: #252535;
+    color: #777;
+    border: 1px solid #3a3a5a;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-family: inherit;
+    transition: .15s;
+}
+
+.bt-mode-btn:hover  { background: #2e2e45; color: #ccc; }
+.bt-mode-btn.active { background: hsl(260, 50%, 33%); border-color: hsl(260, 50%, 45%); color: #f0f0f0; }
+
+/* Mode texte : input + dropdown */
+.bt-text-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+    flex-shrink: 0;
+    transition: outline 0.2s;
+}
+
+.bt-text-wrap.bt-text-ok { outline: 2px solid #6ec26e; border-radius: 10px; padding: 4px; }
+.bt-text-wrap.bt-text-ko { outline: 2px solid #e06060; border-radius: 10px; padding: 4px; }
+
+.bt-text-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1e1e30;
+    color: #f0f0f0;
+    border: 1px solid #3a3a5a;
+    border-radius: 10px;
+    font-size: 0.9em;
+    font-family: inherit;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color .15s;
+}
+
+.bt-text-input:focus  { border-color: hsl(260, 50%, 55%); }
+.bt-text-input::placeholder { color: #555; }
+
+.bt-text-dropdown {
+    width: 100%;
+    background: #1a1a2e;
+    border: 1px solid #3a3a5a;
+    border-radius: 8px;
+    overflow: hidden;
+    overflow-y: auto;
+    max-height: 200px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.bt-dd-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85em;
+    color: #b0b0d0;
+    border-bottom: 1px solid rgba(100, 100, 200, 0.1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bt-dd-item:last-child { border-bottom: none; }
+.bt-dd-item:hover { background: rgba(100, 80, 200, 0.2); color: #f0f0f0; }
+
+.bt-dd-title { font-weight: 500; }
+.bt-dd-sub   { font-size: 0.88em; opacity: 0.6; }
+
+.btn.bt-skip-btn {
+    background: transparent;
+    border: 1px solid #3a3a5a;
+    color: #666;
+    border-radius: 8px;
+    width: auto;
+    height: auto;
+    padding: 6px 18px;
+    font-size: 0.8em;
+    font-family: inherit;
+    align-self: center;
+    margin-top: 6px;
+}
+
+.btn.bt-skip-btn:hover,
+.btn.bt-skip-btn:active { background: rgba(255, 255, 255, 0.05); color: #999; transform: none; }
+
+/* Ecran de resultat */
+.bt-result-score {
+    font-size: 2.8em;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1;
+}
+
+.bt-result-sep {
+    color: #666;
+    font-weight: 300;
+    font-size: 0.8em;
+}
+
+.bt-result-sub {
+    color: #888;
+    font-size: 0.88em;
+    margin: 0;
+}

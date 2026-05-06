@@ -418,3 +418,6 @@ video, audio {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
+
+.bt-fab { background-color: hsl(300, 34%, 30%); }
+.bt-fab:hover { background-color: hsl(300, 34%, 22%); }

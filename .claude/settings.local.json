@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"function btNorm\\(s\\) { return \\(s || ''\\).toLowerCase\\(\\).normalize\\('NFD'\\).replace\\(/[̀-ͯ]/g, ''\\).trim\\(\\); } console.log\\(btNorm\\('Frédéric'\\)\\);\")"
+    ]
+  }
+}
