@@ -1287,7 +1287,7 @@
         if (playPauseBtn) {
             const syncIcon = () => {
                 const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
-                playPauseBtn.textContent = (active && !active.paused) ? "⏸" : "▶";
+                playPauseBtn.textContent = (active && !active.paused) ? "II" : "▶";
             };
             playPauseBtn.addEventListener("click", () => {
                 const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
