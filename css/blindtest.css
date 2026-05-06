@@ -98,6 +98,7 @@
     height: auto;
     padding: 12px 28px;
     font-size: 0.95em;
+    font-family: inherit;
     margin: 10px auto 6px;
     display: flex;
     align-items: center;
@@ -122,6 +123,7 @@
     height: auto;
     padding: 12px 22px;
     font-size: 0.9em;
+    font-family: inherit;
     flex: 1;
     max-width: 140px;
 }
@@ -238,19 +240,23 @@
     width: 100%;
 }
 
-.bt-modal-btns .btn {
-    flex: 1;
+.bt-modal-btns .btn,
+#bt-close-btn.btn {
     border-radius: 10px;
     width: auto;
     height: auto;
     padding: 10px 16px;
     font-size: 0.9em;
+    font-family: inherit;
 }
+
+.bt-modal-btns .btn { flex: 1; }
 
 .btn.bt-cancel-btn {
     background: transparent;
     border: 1px solid #555;
     color: #888;
+    font-family: inherit;
 }
 
 .btn.bt-cancel-btn:hover,

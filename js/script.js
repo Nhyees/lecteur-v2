@@ -350,7 +350,7 @@
         }
         manager.appendChild(select);
         manager.appendChild(newBtn);
-        manager.appendChild(renameBtn);
+        if (!isMobile) manager.appendChild(renameBtn);
         manager.appendChild(deleteBtn);
 
         const exportBtn = document.createElement("button");
@@ -359,7 +359,7 @@
         exportBtn.textContent = "💾";
         exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
         exportBtn.addEventListener("click", exportPlaylist);
-        manager.appendChild(exportBtn);
+        if (!isMobile) manager.appendChild(exportBtn);
 
         // Controles d'import
         const fileInput = document.createElement("input");
@@ -405,6 +405,12 @@
         headingRow.className = "heading-row";
         headingRow.appendChild(heading);
         headingRow.appendChild(sortBar);
+        if (isMobile) {
+            const spacer = document.createElement("div");
+            spacer.style.flex = "1";
+            headingRow.appendChild(spacer);
+            headingRow.appendChild(exportBtn);
+        }
 
         const searchInput = document.createElement("input");
         searchInput.type = "search";
@@ -688,7 +694,7 @@
                 const pauseBtn = document.getElementById("bt-pause-btn");
                 if (pauseBtn) {
                     const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
-                    pauseBtn.textContent = (med && !med.paused) ? "⏸" : "▶";
+                    pauseBtn.textContent = (med && !med.paused) ? "II" : "▶";
                 }
             }
         }
@@ -946,13 +952,13 @@
         const pauseBtn = document.createElement("button");
         pauseBtn.id        = "bt-pause-btn";
         pauseBtn.className = "bt-pause-btn";
-        pauseBtn.textContent = "⏸";
+        pauseBtn.textContent = "II";
         pauseBtn.addEventListener("click", function() {
             const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
             if (!med) return;
             if (med.paused) {
                 med.play().catch(function() {});
-                this.textContent = "⏸";
+                this.textContent = "II";
             } else {
                 med.pause();
                 this.textContent = "▶";
