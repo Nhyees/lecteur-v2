@@ -359,30 +359,26 @@
         exportBtn.textContent = "💾";
         exportBtn.setAttribute("aria-label", "Exporter la playlist en JSON");
         exportBtn.addEventListener("click", exportPlaylist);
-        if (!isMobile) manager.appendChild(exportBtn);
-
         // Controles d'import
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.id = "fileInput";
         fileInput.accept = ".json";
-        fileInput.style.display = "none";
         fileInput.setAttribute("aria-label", "Importer une playlist JSON");
         fileInput.addEventListener("change", handleFileUpload);
 
-        let importRow = null;
         if (isMobile) {
-            manager.appendChild(fileInput);
+            fileInput.style.display = "none";
             const importLabel = document.createElement("label");
             importLabel.htmlFor = "fileInput";
             importLabel.className = "btn playlist-btn";
             importLabel.textContent = "📂";
             importLabel.setAttribute("aria-label", "Importer une playlist JSON");
+            manager.appendChild(fileInput);
+            manager.appendChild(exportBtn);
             manager.appendChild(importLabel);
         } else {
-            importRow = document.createElement("div");
-            importRow.className = "import-row";
-            importRow.appendChild(fileInput);
+            manager.appendChild(exportBtn);
         }
 
         const heading = document.createElement("h2");
@@ -405,12 +401,6 @@
         headingRow.className = "heading-row";
         headingRow.appendChild(heading);
         headingRow.appendChild(sortBar);
-        if (isMobile) {
-            const spacer = document.createElement("div");
-            spacer.style.flex = "1";
-            headingRow.appendChild(spacer);
-            headingRow.appendChild(exportBtn);
-        }
 
         const searchInput = document.createElement("input");
         searchInput.type = "search";
@@ -423,9 +413,9 @@
             filterMusicItems();
         });
 
-        const listChildren = importRow
-            ? [manager, importRow, headingRow, searchInput]
-            : [manager, headingRow, searchInput];
+        const listChildren = isMobile
+            ? [manager, headingRow, searchInput]
+            : [manager, fileInput, headingRow, searchInput];
         list.replaceChildren(...listChildren);
 
         if (state.musicData.length === 0) {

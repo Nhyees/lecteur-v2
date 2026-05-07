@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+button, input, select, textarea { font-family: inherit; }
+
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #f8c8dc, #d1a3ff);
