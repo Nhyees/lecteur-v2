@@ -417,7 +417,7 @@
             detailName.textContent  = pl.nom;
             detailDesc.textContent  = pl.description || '';
             detailOwner.textContent = `By ${pl.users?.pseudo || '?'}`;
-            $('detail-dates').textContent = `created ${formatDate(pl.created_at)}${pl.updated_at ? ` ~ last updated ${formatDate(pl.updated_at)}` : ''}`;
+            $('detail-dates').textContent = `created: ${formatDateISO(pl.created_at)}${pl.updated_at ? ` ~ updated: ${formatDateISO(pl.updated_at)}` : ''}`;
             playlistActionGroup.style.display = 'flex';
             const canEdit = !!state.user?.approved;
             deletePlaylistBtn.style.display = canEdit ? 'inline-flex' : 'none';
@@ -730,7 +730,7 @@
                 state.currentPlaylist.description = newDesc || null;
                 state.currentPlaylist.updated_at = now;
                 detailDesc.textContent = newDesc || '';
-                $('detail-dates').textContent = `created ${formatDate(state.currentPlaylist.created_at)} ~ last updated ${formatDate(now)}`;
+                $('detail-dates').textContent = `created: ${formatDateISO(state.currentPlaylist.created_at)} ~ updated: ${formatDateISO(now)}`;
             }
             renderPlaylists();
             closeEditModal();

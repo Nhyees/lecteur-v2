@@ -1103,7 +1103,7 @@
         volSlider.id    = "bt-volume-slider";
         volSlider.min   = "0";
         volSlider.max   = "1";
-        volSlider.step  = "0.05";
+        volSlider.step  = "any";
         volSlider.value = state.savedVolume;
         volSlider.addEventListener("input", function() {
             const v = parseFloat(this.value);
