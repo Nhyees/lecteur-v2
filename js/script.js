@@ -530,14 +530,23 @@
                     alert("Aucune chanson valide trouvée dans le fichier.");
                     return;
                 }
-                state.musicData = state.musicData.concat(valid);
+                const existingKeys = new Set(
+                    state.musicData.map(s => `${s.songName}|${s.songArtist}|${s.animeJPName}`)
+                );
+                const newSongs = valid.filter(s =>
+                    !existingKeys.has(`${s.songName}|${s.songArtist}|${s.animeJPName}`)
+                );
+                const duplicates = valid.length - newSongs.length;
+                state.musicData = state.musicData.concat(newSongs);
                 state.searchQuery = "";
                 savePlaylists();
                 renderMusicList();
-                const ignored = parsed.length - valid.length;
-                showToast(ignored > 0
-                    ? `${valid.length} chanson(s) ajoutée(s) — ${ignored} ignorée(s).`
-                    : `${valid.length} chanson(s) ajoutée(s).`);
+                const invalid = parsed.length - valid.length;
+                const parts = [];
+                if (newSongs.length > 0) parts.push(`${newSongs.length} chanson(s) ajoutée(s)`);
+                if (duplicates > 0)     parts.push(`${duplicates} doublon(s) ignoré(s)`);
+                if (invalid > 0)        parts.push(`${invalid} invalide(s) ignorée(s)`);
+                showToast(parts.join(" — ") + ".");
             } catch (_) {
                 alert("Erreur lors du chargement du fichier JSON.");
             }
