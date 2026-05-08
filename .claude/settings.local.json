@@ -3,7 +3,8 @@
     "allow": [
       "Bash(node -e \"function btNorm\\(s\\) { return \\(s || ''\\).toLowerCase\\(\\).normalize\\('NFD'\\).replace\\(/[̀-ͯ]/g, ''\\).trim\\(\\); } console.log\\(btNorm\\('Frédéric'\\)\\);\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\nhi_2\\\\OneDrive\\\\Documents\\\\Projet\\\\lecteur-v2\" -Recurse -File)",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(git remote *)"
     ]
   }
 }
