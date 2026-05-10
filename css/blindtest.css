@@ -383,3 +383,15 @@
     font-size: 0.88em;
     margin: 0;
 }
+
+.yt-open-link {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 14px;
+    background: #ff0000;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85em;
+    font-weight: 600;
+}
