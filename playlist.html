@@ -24,6 +24,9 @@
 
             <video id="videoPlayer" controls aria-label="Lecteur video"></video>
             <audio id="audioPlayer" controls style="display: none;" aria-label="Lecteur audio"></audio>
+            <div id="youtubeWrapper" style="display:none; width:100%; aspect-ratio:16/9;">
+                <div id="youtubePlayer"></div>
+            </div>
 
             <div class="controls">
                 <button id="prevButton" class="btn" aria-label="Chanson precedente">⏮</button>
@@ -59,6 +62,7 @@
             extraStorageKeys: ["playlist_wrongSongs"]
         };
     </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="js/script.js"></script>
 
 </body>

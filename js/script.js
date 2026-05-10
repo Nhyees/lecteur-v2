@@ -16,12 +16,16 @@
             const url = videoUrl.startsWith("http")
                 ? videoUrl
                 : "https://eudist.animemusicquiz.com/" + videoUrl;
+            const ytId = getYouTubeId(url);
+            if (ytId) return { type: "youtube", videoId: ytId };
             return { type: "video", url };
         }
         const audioUrl = song.audio || "";
         const url = audioUrl.startsWith("http")
             ? audioUrl
             : "https://eudist.animemusicquiz.com/" + audioUrl;
+        const ytId = getYouTubeId(url);
+        if (ytId) return { type: "youtube", videoId: ytId };
         return { type: "audio", url };
     }
 
@@ -40,8 +44,66 @@
     };
 
     // -- Elements DOM --------------------------------------------------------
-    const videoPlayer = document.getElementById("videoPlayer");
-    const audioPlayer = document.getElementById("audioPlayer");
+    const videoPlayer      = document.getElementById("videoPlayer");
+    const audioPlayer      = document.getElementById("audioPlayer");
+    const youtubeContainer = document.getElementById("youtubeWrapper");
+
+    // -- YouTube IFrame API --------------------------------------------------
+    let ytPlayer  = null;
+    let ytReady   = false;
+    let ytPending = null;
+
+    function getYouTubeId(url) {
+        if (!url) return null;
+        const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        return match ? match[1] : null;
+    }
+
+    function initYouTubePlayer() {
+        if (!youtubeContainer || ytPlayer) return;
+        ytPlayer = new YT.Player("youtubePlayer", {
+            height: "100%",
+            width: "100%",
+            playerVars: { autoplay: 0, controls: 1, rel: 0 },
+            events: {
+                onReady: function() {
+                    ytReady = true;
+                    ytPlayer.setVolume(state.savedVolume * 100);
+                    if (ytPending) {
+                        if (ytPending.startSeconds !== undefined) {
+                            ytPlayer.loadVideoById({ videoId: ytPending.videoId, startSeconds: ytPending.startSeconds });
+                        } else if (ytPending.autoPlay) {
+                            ytPlayer.loadVideoById(ytPending.videoId);
+                        } else {
+                            ytPlayer.cueVideoById(ytPending.videoId);
+                        }
+                        ytPending = null;
+                    }
+                },
+                onStateChange: function(event) {
+                    if (event.data === YT.PlayerState.ENDED) {
+                        if (bt.active) return;
+                        if (state.isRepeat) playMusic(state.currentIndex);
+                        else if (state.isShuffle) playRandomMusic();
+                        else playNext();
+                    }
+                    const ppBtn = document.getElementById("playPauseButton");
+                    if (ppBtn && youtubeContainer && youtubeContainer.style.display !== "none") {
+                        ppBtn.textContent = (event.data === YT.PlayerState.PLAYING) ? "II" : "▶";
+                    }
+                    const btPauseBtn = document.getElementById("bt-pause-btn");
+                    if (btPauseBtn && bt.active) {
+                        btPauseBtn.textContent = (event.data === YT.PlayerState.PLAYING) ? "⏸" : "▶";
+                    }
+                }
+            }
+        });
+    }
+
+    window.onYouTubeIframeAPIReady = initYouTubePlayer;
+
+    // Si l'API etait deja chargee (cache navigateur) avant que ce script tourne
+    if (window.YT && window.YT.Player) initYouTubePlayer();
 
     // -- Historique ----------------------------------------------------------
     function updateHistory(index) {
@@ -85,7 +147,19 @@
         state.currentIndex = index;
         const song = state.musicData[state.currentIndex];
         const media = buildUrlAuto(song);
-        if (media.type === "video") {
+        if (media.type === "youtube") {
+            if (audioPlayer) { audioPlayer.pause(); audioPlayer.src = ""; audioPlayer.style.display = "none"; }
+            if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; videoPlayer.style.display = "none"; }
+            if (youtubeContainer) youtubeContainer.style.display = "block";
+            if (ytReady) {
+                ytPlayer.setVolume(state.savedVolume * 100);
+                if (autoPlay) ytPlayer.loadVideoById(media.videoId);
+                else ytPlayer.cueVideoById(media.videoId);
+            } else {
+                ytPending = { videoId: media.videoId, autoPlay: !!autoPlay };
+            }
+        } else if (media.type === "video") {
+            if (youtubeContainer) { youtubeContainer.style.display = "none"; if (ytReady) ytPlayer.stopVideo(); }
             if (audioPlayer) { audioPlayer.pause(); audioPlayer.src = ""; audioPlayer.style.display = "none"; }
             if (videoPlayer) {
                 videoPlayer.src = media.url;
@@ -103,6 +177,7 @@
                 }, { once: true });
             }
         } else {
+            if (youtubeContainer) { youtubeContainer.style.display = "none"; if (ytReady) ytPlayer.stopVideo(); }
             if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; videoPlayer.style.display = "none"; }
             if (audioPlayer) {
                 audioPlayer.src = media.url;
@@ -118,6 +193,8 @@
         if (state.musicData.length === 0) return;
         if (state.musicData[state.currentIndex]) updateHistory(state.currentIndex);
         prepareMusic(index, true);
+        const media = buildUrlAuto(state.musicData[index]);
+        if (media.type === "youtube") return;
         const active = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
         if (active) active.play().catch(() => {});
     }
@@ -164,6 +241,7 @@
     function stopPlayer() {
         if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; }
         if (audioPlayer) { audioPlayer.pause(); audioPlayer.src = ""; }
+        if (youtubeContainer) { youtubeContainer.style.display = "none"; if (ytReady) ytPlayer.stopVideo(); }
         clearSongInfo();
     }
 
@@ -736,6 +814,10 @@
             videoPlayer.style.filter        = (bt.active && !bt.revealed) ? "brightness(0)" : "";
             videoPlayer.style.pointerEvents = (bt.active && !bt.revealed) ? "none"           : "";
         }
+        if (youtubeContainer) {
+            youtubeContainer.style.filter        = (bt.active && !bt.revealed) ? "brightness(0)" : "";
+            youtubeContainer.style.pointerEvents = (bt.active && !bt.revealed) ? "none"           : "";
+        }
 
         // Infos chanson : cachees quand non revele
         const songInfoEl = document.getElementById("songInfo");
@@ -747,8 +829,12 @@
         // Sync slider volume
         const volSlider = document.getElementById("bt-volume-slider");
         if (volSlider) {
-            const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
-            if (med) volSlider.value = med.volume;
+            if (youtubeContainer && youtubeContainer.style.display !== "none") {
+                volSlider.value = state.savedVolume;
+            } else {
+                const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
+                if (med) volSlider.value = med.volume;
+            }
         }
     }
 
@@ -759,8 +845,12 @@
 
     function btShowSetup() {
         if (bt.active) {
-            const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
-            if (med) med.pause();
+            if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                ytPlayer.pauseVideo();
+            } else {
+                const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
+                if (med) med.pause();
+            }
             bt.active      = false;
             bt.revealed    = false;
             bt.listVisible = false;
@@ -818,20 +908,34 @@
 
         const song  = state.musicData[idx];
         const media = buildUrlAuto(song);
-        const isVid = media.type === "video";
-        const useEl  = isVid ? videoPlayer : audioPlayer;
-        const skipEl = isVid ? audioPlayer  : videoPlayer;
 
-        if (skipEl) { skipEl.pause(); skipEl.src = ""; skipEl.style.display = "none"; }
-        if (useEl) {
-            useEl.src    = media.url;
-            useEl.volume = state.savedVolume;
-            useEl.style.display = "block";
-            useEl.addEventListener("loadedmetadata", function() {
-                const d = useEl.duration;
-                if (d && isFinite(d)) useEl.currentTime = d * (0.1 + Math.random() * 0.5);
-                useEl.play().catch(function() {});
-            }, { once: true });
+        if (media.type === "youtube") {
+            if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ""; videoPlayer.style.display = "none"; }
+            if (audioPlayer) { audioPlayer.pause(); audioPlayer.src = ""; audioPlayer.style.display = "none"; }
+            if (youtubeContainer) youtubeContainer.style.display = "block";
+            const startSeconds = Math.floor(30 + Math.random() * 60);
+            if (ytReady) {
+                ytPlayer.setVolume(state.savedVolume * 100);
+                ytPlayer.loadVideoById({ videoId: media.videoId, startSeconds });
+            } else {
+                ytPending = { videoId: media.videoId, autoPlay: true, startSeconds };
+            }
+        } else {
+            const isVid = media.type === "video";
+            const useEl  = isVid ? videoPlayer : audioPlayer;
+            const skipEl = isVid ? audioPlayer  : videoPlayer;
+            if (youtubeContainer) { youtubeContainer.style.display = "none"; if (ytReady) ytPlayer.stopVideo(); }
+            if (skipEl) { skipEl.pause(); skipEl.src = ""; skipEl.style.display = "none"; }
+            if (useEl) {
+                useEl.src    = media.url;
+                useEl.volume = state.savedVolume;
+                useEl.style.display = "block";
+                useEl.addEventListener("loadedmetadata", function() {
+                    const d = useEl.duration;
+                    if (d && isFinite(d)) useEl.currentTime = d * (0.1 + Math.random() * 0.5);
+                    useEl.play().catch(function() {});
+                }, { once: true });
+            }
         }
         btUpdateUI();
     }
@@ -953,6 +1057,14 @@
         pauseBtn.className = "bt-pause-btn";
         pauseBtn.textContent = "II";
         pauseBtn.addEventListener("click", function() {
+            if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                    ytPlayer.pauseVideo();
+                } else {
+                    ytPlayer.playVideo();
+                }
+                return;
+            }
             const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
             if (!med) return;
             if (med.paused) {
@@ -968,6 +1080,10 @@
             if (!bt.active) return;
             const btn = document.getElementById("bt-pause-btn");
             if (!btn) return;
+            if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                btn.textContent = ytPlayer.getPlayerState() === YT.PlayerState.PLAYING ? "⏸" : "▶";
+                return;
+            }
             const med = (videoPlayer && videoPlayer.style.display !== "none") ? videoPlayer : audioPlayer;
             btn.textContent = (med && !med.paused) ? "⏸" : "▶";
         }
@@ -1118,6 +1234,7 @@
             const v = parseFloat(this.value);
             if (videoPlayer) videoPlayer.volume = v;
             if (audioPlayer) audioPlayer.volume = v;
+            if (ytReady && youtubeContainer && youtubeContainer.style.display !== "none") ytPlayer.setVolume(v * 100);
             state.savedVolume = v;
             localStorage.setItem("savedVolume", v);
         });
@@ -1245,6 +1362,7 @@
             videoPlayer.addEventListener("volumechange", () => {
                 state.savedVolume = videoPlayer.volume;
                 localStorage.setItem("savedVolume", state.savedVolume);
+                if (ytReady) ytPlayer.setVolume(state.savedVolume * 100);
             });
             videoPlayer.addEventListener("ended", () => {
                 if (bt.active) return;
@@ -1285,10 +1403,19 @@
         const playPauseBtn = document.getElementById("playPauseButton");
         if (playPauseBtn) {
             const syncIcon = () => {
+                if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                    playPauseBtn.textContent = ytPlayer.getPlayerState() === YT.PlayerState.PLAYING ? "II" : "▶";
+                    return;
+                }
                 const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
                 playPauseBtn.textContent = (active && !active.paused) ? "II" : "▶";
             };
             playPauseBtn.addEventListener("click", () => {
+                if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                    if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+                    else ytPlayer.playVideo();
+                    return;
+                }
                 const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
                 if (!active) return;
                 active.paused ? active.play() : active.pause();
@@ -1320,8 +1447,13 @@
             if (e.target.tagName === "INPUT") return;
             if (e.code === "Space") {
                 e.preventDefault();
-                const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
-                if (active) active.paused ? active.play() : active.pause();
+                if (youtubeContainer && youtubeContainer.style.display !== "none" && ytReady) {
+                    if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+                    else ytPlayer.playVideo();
+                } else {
+                    const active = videoPlayer && videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
+                    if (active) active.paused ? active.play() : active.pause();
+                }
             }
             if (e.code === "ArrowRight") playNext();
             if (e.code === "ArrowLeft")  playPrevious();
