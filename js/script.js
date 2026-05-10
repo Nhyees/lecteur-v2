@@ -101,21 +101,7 @@
                     const videoUrl = song && (song.HQ || song.MQ || song.audio || "");
                     const videoId = getYouTubeId(videoUrl);
                     const ytUrl = videoId ? "https://www.youtube.com/watch?v=" + videoId : null;
-                    const msg = "Cette video ne peut pas etre lue ici (integrations desactivees).";
-                    showToast(msg);
-                    if (ytUrl) {
-                        const existing = document.getElementById("yt-open-link");
-                        if (existing) existing.remove();
-                        const link = document.createElement("a");
-                        link.id = "yt-open-link";
-                        link.href = ytUrl;
-                        link.target = "_blank";
-                        link.rel = "noopener";
-                        link.textContent = "Ouvrir sur YouTube";
-                        link.className = "yt-open-link";
-                        const infoBox = document.getElementById("songInfo");
-                        if (infoBox) infoBox.appendChild(link);
-                    }
+                    showToast("Cette video ne peut pas etre lue ici (integrations desactivees).");
                 }
             }
         });
@@ -206,8 +192,6 @@
                 audioPlayer.style.display = "block";
             }
         }
-        const oldLink = document.getElementById("yt-open-link");
-        if (oldLink) oldLink.remove();
         updateSongInfo();
         highlightCurrentSong();
     }
