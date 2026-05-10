@@ -53,6 +53,9 @@
     let ytReady   = false;
     let ytPending = null;
 
+    // Compteur pour invalider les evenements d'erreur video des chansons precedentes
+    let mediaGeneration = 0;
+
     function getYouTubeId(url) {
         if (!url) return null;
         const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
@@ -152,6 +155,8 @@
     function prepareMusic(index, autoPlay) {
         if (state.musicData.length === 0) return;
         state.currentIndex = index;
+        mediaGeneration++;
+        const gen = mediaGeneration;
         const song = state.musicData[state.currentIndex];
         const media = buildUrlAuto(song);
         if (media.type === "youtube") {
@@ -173,6 +178,7 @@
                 videoPlayer.volume = state.savedVolume;
                 videoPlayer.style.display = "block";
                 videoPlayer.addEventListener("error", function() {
+                    if (mediaGeneration !== gen) return;
                     videoPlayer.src = "";
                     videoPlayer.style.display = "none";
                     if (audioPlayer) {
