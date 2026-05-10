@@ -187,7 +187,8 @@ audio { width: 100%; margin-top: 10px; }
     border: 1px solid rgba(33, 118, 174, 0.3);
 }
 
-video {
+video,
+#youtubeWrapper {
     width: 100%;
     max-width: 100%;
     min-height: 0;

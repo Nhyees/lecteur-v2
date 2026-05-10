@@ -213,7 +213,8 @@ audio {
     border: 3px solid #5d483a;
 }
 
-video {
+video,
+#youtubeWrapper {
     width: 100%;
     max-width: 100%;
     min-height: 0;
