@@ -99,13 +99,6 @@
                         btPauseBtn.textContent = (event.data === YT.PlayerState.PLAYING) ? "⏸" : "▶";
                     }
                 },
-                onError: function(event) {
-                    const song = state.musicData[state.currentIndex];
-                    const videoUrl = song && (song.HQ || song.MQ || song.audio || "");
-                    const videoId = getYouTubeId(videoUrl);
-                    const ytUrl = videoId ? "https://www.youtube.com/watch?v=" + videoId : null;
-                    showToast("Cette video ne peut pas etre lue ici (integrations desactivees).");
-                }
             }
         });
     }
@@ -458,6 +451,12 @@
         fileInput.setAttribute("aria-label", "Importer une playlist JSON");
         fileInput.addEventListener("change", handleFileUpload);
 
+        const addSongBtn = document.createElement("button");
+        addSongBtn.className = "sort-btn";
+        addSongBtn.textContent = "+";
+        addSongBtn.setAttribute("aria-label", "Ajouter une chanson");
+        addSongBtn.addEventListener("click", () => openSongModal());
+
         if (isMobile) {
             fileInput.style.display = "none";
             const importLabel = document.createElement("label");
@@ -468,6 +467,7 @@
             manager.appendChild(fileInput);
             manager.appendChild(exportBtn);
             manager.appendChild(importLabel);
+            manager.appendChild(addSongBtn);
         } else {
             manager.appendChild(exportBtn);
         }
@@ -504,9 +504,14 @@
             filterMusicItems();
         });
 
+        const importRow = document.createElement("div");
+        importRow.className = "import-row";
+        importRow.appendChild(addSongBtn);
+        importRow.appendChild(fileInput);
+
         const listChildren = isMobile
             ? [manager, headingRow, searchInput]
-            : [manager, fileInput, headingRow, searchInput];
+            : [manager, importRow, headingRow, searchInput];
         list.replaceChildren(...listChildren);
 
         if (state.musicData.length === 0) {
@@ -605,6 +610,108 @@
         }, 3000);
     }
 
+    function openSongModal(editIndex) {
+        const isEdit = editIndex !== undefined && editIndex !== null;
+        const song = isEdit ? state.musicData[editIndex] : null;
+
+        const overlay = document.createElement("div");
+        overlay.className = "song-modal-overlay";
+
+        const modal = document.createElement("div");
+        modal.className = "song-modal";
+
+        const titleEl = document.createElement("h3");
+        titleEl.textContent = isEdit ? "Modifier la chanson" : "Ajouter une chanson";
+        modal.appendChild(titleEl);
+
+        function makeField(label, id, value, placeholder, required) {
+            const row = document.createElement("div");
+            row.className = "song-modal-field";
+            const lbl = document.createElement("label");
+            lbl.htmlFor = id;
+            lbl.textContent = label + (required ? "" : " (optionnel)");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.id = id;
+            input.className = "song-modal-input";
+            input.value = value || "";
+            input.placeholder = placeholder || "";
+            row.appendChild(lbl);
+            row.appendChild(input);
+            return row;
+        }
+
+        modal.appendChild(makeField("Titre", "sm-songName", song && song.songName, "Merry-Go-Round", true));
+        modal.appendChild(makeField("Artiste", "sm-songArtist", song && song.songArtist, "Yuuri", true));
+        modal.appendChild(makeField("Anime", "sm-animeJPName", song && song.animeJPName, "Kagami no Kojou", true));
+        modal.appendChild(makeField("Type", "sm-songType", song && song.songType, "Ending 1", true));
+        modal.appendChild(makeField("URL HQ", "sm-HQ", song && song.HQ, "omlbw9.webm", false));
+        modal.appendChild(makeField("URL MQ", "sm-MQ", song && song.MQ, "omlbw9.webm", false));
+        modal.appendChild(makeField("URL Audio", "sm-audio", song && song.audio, "53ocea.mp3", false));
+
+        const errMsg = document.createElement("p");
+        errMsg.className = "song-modal-error";
+        modal.appendChild(errMsg);
+
+        const btnRow = document.createElement("div");
+        btnRow.className = "song-modal-btns";
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "btn";
+        saveBtn.textContent = "Enregistrer";
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "btn song-modal-cancel";
+        cancelBtn.textContent = "Annuler";
+        btnRow.appendChild(saveBtn);
+        btnRow.appendChild(cancelBtn);
+        modal.appendChild(btnRow);
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        function getVal(id) { return document.getElementById(id).value.trim(); }
+        function close() { overlay.remove(); }
+
+        cancelBtn.addEventListener("click", close);
+        overlay.addEventListener("click", function(e) { if (e.target === overlay) close(); });
+
+        saveBtn.addEventListener("click", function() {
+            const songName    = getVal("sm-songName");
+            const songArtist  = getVal("sm-songArtist");
+            const animeJPName = getVal("sm-animeJPName");
+            const songType    = getVal("sm-songType");
+
+            if (!songName || !songArtist || !animeJPName || !songType) {
+                errMsg.textContent = "Les champs Titre, Artiste, Anime et Type sont obligatoires.";
+                return;
+            }
+
+            const newSong = { songName, songArtist, animeJPName, songType };
+            const hq = getVal("sm-HQ"), mq = getVal("sm-MQ"), audio = getVal("sm-audio");
+            if (hq) newSong.HQ = hq;
+            if (mq) newSong.MQ = mq;
+            if (audio) newSong.audio = audio;
+
+            if (isEdit) {
+                state.musicData[editIndex] = newSong;
+                savePlaylists();
+                renderMusicList();
+                updateSongInfo();
+                showToast("Chanson modifiee.");
+            } else {
+                const key = `${songName}|${songArtist}|${animeJPName}`;
+                if (state.musicData.some(s => `${s.songName}|${s.songArtist}|${s.animeJPName}` === key)) {
+                    errMsg.textContent = "Cette chanson est deja dans la playlist.";
+                    return;
+                }
+                state.musicData.push(newSong);
+                savePlaylists();
+                renderMusicList();
+                showToast("Chanson ajoutee.");
+            }
+            close();
+        });
+    }
+
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -637,7 +744,7 @@
                 if (newSongs.length > 0) parts.push(`${newSongs.length} chanson(s) ajoutée(s)`);
                 if (duplicates > 0)     parts.push(`${duplicates} doublon(s) ignoré(s)`);
                 if (invalid > 0)        parts.push(`${invalid} invalide(s) ignorée(s)`);
-                showToast(parts.join(" — ") + ".");
+                showToast(parts.join(" & ") + ".");
             } catch (_) {
                 alert("Erreur lors du chargement du fichier JSON.");
             }
@@ -1451,6 +1558,14 @@
         if (toggleHistoryBtn && historyBox) {
             toggleHistoryBtn.addEventListener("click", () => {
                 historyBox.style.display = historyBox.style.display === "block" ? "none" : "block";
+            });
+        }
+
+        const songInfoEl = document.getElementById("songInfo");
+        if (songInfoEl) {
+            songInfoEl.addEventListener("dblclick", function() {
+                if (state.musicData.length === 0) return;
+                openSongModal(state.currentIndex);
             });
         }
 

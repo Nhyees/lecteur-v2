@@ -452,6 +452,19 @@ video,
     transform: translateX(-50%) translateY(0);
 }
 
+
+/* Modale ajout / edition - theme orange */
+.song-modal-overlay { background: rgba(93, 72, 58, 0.55); }
+.song-modal { background: #ffe0b2; border-color: #ff8a65; }
+.song-modal h3 { color: #4a2c2a; }
+.song-modal-field label { color: #a06040; }
+.song-modal-input { background: rgba(255, 255, 255, 0.7); color: #4a2c2a; border-color: #ff8a65; }
+.song-modal-input:focus { border-color: #ff5722; background: rgba(255, 255, 255, 0.9); }
+.song-modal-input::placeholder { color: #a06040; }
+.song-modal-cancel { background: rgba(255, 255, 255, 0.4); color: #a06040; }
+.song-modal-cancel:hover { background: rgba(255, 87, 34, 0.08); color: #4a2c2a; }
+.song-modal-error { color: #b83232; }
+
 /* Blindtest - surcharges theme orange */
 .bt-fab { background-color: #5d483a; }
 .bt-fab:hover { background-color: #7a6050; }

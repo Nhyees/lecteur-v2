@@ -234,6 +234,17 @@ video,
 
 .theme-toggle-btn:hover { background: rgba(66, 165, 245, 0.85); color: #071624; border-color: #42a5f5; }
 
+
+/* Modale ajout / edition - theme aria */
+.song-modal { background: #0d1f35; border-color: #1a4a7a; }
+.song-modal h3 { color: #c8e8f8; }
+.song-modal-field label { color: #4a8fb5; }
+.song-modal-input { background: #0c2840; color: #c8e8f8; border-color: #1a4a7a; }
+.song-modal-input:focus { border-color: #42a5f5; }
+.song-modal-input::placeholder { color: #4a8fb5; }
+.song-modal-cancel { background: #0c2840; color: #4a8fb5; }
+.song-modal-cancel:hover { background: #142e4a; color: #c8e8f8; }
+
 /* Blindtest - surcharges theme aria */
 .bt-fab { background-color: #0c3252; }
 .bt-fab:hover { background: rgba(66, 165, 245, 0.85); color: #071624; }

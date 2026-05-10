@@ -378,7 +378,8 @@ video, audio {
     flex-wrap: wrap;
     margin: 10px 0 6px;
 }
-.heading-row h2 { margin: 0; }
+.heading-row h2 { margin: 0; flex: 1; }
+
 
 .sort-bar { display: flex; gap: 5px; flex-wrap: wrap; }
 

@@ -390,3 +390,84 @@
     font-size: 0.88em;
     margin: 0;
 }
+
+/* Modale ajout / edition de chanson */
+.song-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+}
+
+.song-modal {
+    background: #1a1a2a;
+    border: 1px solid #3a3a5a;
+    border-radius: 16px;
+    padding: 24px 28px;
+    width: min(420px, 92vw);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 90dvh;
+    overflow-y: auto;
+}
+
+.song-modal h3 {
+    margin: 0 0 4px;
+    font-size: 1.05em;
+    color: #e0c0f0;
+}
+
+.song-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.song-modal-field label {
+    font-size: 0.78em;
+    color: #aaa;
+}
+
+.song-modal-input {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #fff;
+    padding: 7px 10px;
+    font-size: 0.88em;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.song-modal-input:focus {
+    outline: none;
+    border-color: hsl(300, 40%, 50%);
+}
+
+.song-modal-error {
+    color: #e07070;
+    font-size: 0.82em;
+    margin: 0;
+    min-height: 1.1em;
+}
+
+.song-modal-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.song-modal-cancel {
+    background: #333;
+}
+
+.song-modal-cancel:hover {
+    background: #444;
+}

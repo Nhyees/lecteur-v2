@@ -5,7 +5,10 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\nhi_2\\\\OneDrive\\\\Documents\\\\Projet\\\\lecteur-v2\" -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(git remote *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\nhi_2\\\\OneDrive\\\\Documents\\\\Projet\\\\lecteur-v2\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(dir \"C:\\\\Users\\\\nhi_2\\\\OneDrive\\\\Documents\\\\Projet\\\\lecteur-v2\")"
     ]
   }
 }
